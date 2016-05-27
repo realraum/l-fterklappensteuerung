@@ -14,9 +14,9 @@ Schaltleistung: 40A mit eingebautem Snubber. bei induktiven Lasten: 40% Strom de
 
 SSR zieht 40mA -> schaltung für einen Transistor oder FET
 
-Zusätzlich: Varistor für 230V parallel zum SSR
-
-z.b.: S14K680 von Neuhold
+Zusätzlich: Varistor für 230V parallel zum SSR:
+--> S7K275 welche im r3 sind
+oder alternativ S14K680 von Neuhold
 oder notfalls: 2x S10K150 in Serie
 
 generelle Infos:
@@ -40,4 +40,9 @@ SBL10L25 od. Ähnliches
 
 ===== Gabellichtschranken =====
 
-20kOhm(?) an K Ausgang um Widerstand der Photodiode zu balancieren.
+2k2 Ohm(?) an K Ausgang um Widerstand der Photodiode zu balancieren.
+
+120 Ohm Vorwiderstand für die LED
+
+===== Drucksensor =====
+BMP280
