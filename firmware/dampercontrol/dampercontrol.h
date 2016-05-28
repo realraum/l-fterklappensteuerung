@@ -47,10 +47,10 @@
 #define ENDSTOP_0_ISHIGH PIN_SW(PORTB,PB5,OP_CHECK)
 #define ENDSTOP_1_ISHIGH PIN_SW(PORTB,PB6,OP_CHECK)
 #define ENDSTOP_2_ISHIGH PIN_SW(PORTB,PB7,OP_CHECK)
-#define ENDSTOP_ISHIGH(x) PIN_SW(PORTB,PB5+x,OP_CHECK)
+#define ENDSTOP_ISHIGH(x) PIN_SW(PORTB,(PB5+x),OP_CHECK)
 
-#define DAMPER_MOTOR_RUN(x) PIN_SW(PORTB,PD0+x,OP_SETBIT)
-#define DAMPER_MOTOR_STOP(x) PIN_SW(PORTB,PD0+x,OP_CLEARBIT)
+#define DAMPER_MOTOR_RUN(x) PIN_SW(PORTB,(PD0+x),OP_SETBIT)
+#define DAMPER_MOTOR_STOP(x) PIN_SW(PORTB,(PD0+x),OP_CLEARBIT)
 
 #define FAN_RUN  PIN_SW(PORTF,PF0,OP_SETBIT)
 #define FAN_STOP PIN_SW(PORTF,PF0,OP_CLEARBIT)
@@ -63,57 +63,50 @@
 
 #define NUM_DAMPER 3
 
-enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS}
-enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN}
-enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO}
-enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT}
+enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS};
+enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN};
+enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO};
+enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
 
-typedef damper uint8_t :2
-
-typedef dampercmd_t struct  {
-  damper[NUM_DAMPER] :6
+typedef struct {
+  uint8_t damper[NUM_DAMPER];
   uint8_t fan : 2;
-};
-typedef pressureinfo_t struct {
+} dampercmd_t;
+
+typedef  struct {
   uint8_t sensorid;
   uint16_t mBar;
-};
-typedef errorinfo_t struct {
+} pressureinfo_t;
+
+typedef  struct {
   uint8_t damperid;
   uint8_t errortype;
-};
-typedef updatesettings_t struct {
+} errorinfo_t;
+
+//todo split this:
+//damper_installed should only be settable via serial
+//damper_open_pos can be setable via PJON
+typedef  struct {
   uint8_t damper_installed;
   uint8_t damper_open_pos[NUM_DAMPER];
-};
+} updatesettings_t;
 
 
-struct pjon_message_t {
+typedef struct {
   uint8_t type;
-  union data {
+  union {
     dampercmd_t dampercmd;
     pressureinfo_t pressureinfo;
     errorinfo_t errorinfo;
     updatesettings_t updatesettings;
   };
-};
+} pjon_message_t;
 
 
-
-
-//read this from eeprom on start
-//update on receiving installed_msg
-//tells us which damper is actually controlled by this µC
-bool damper_installed_[NUM_DAMPER] = {false, false, false};
-
-//damper time divisor:
-//every millis that we increase a damper_state if damper is currently moving
-uint8_t damper_open_pos_[NUM_DAMPER] = {128,128,128};
-
-uint8_t pjon_bus_id_ = 9; //default ID
-uint8_t pjon_sensor_destination_id_ = 0;
-
-PJON<SoftwareBitBang> pjonbus_;
+extern bool damper_installed_[NUM_DAMPER];
+extern uint8_t damper_open_pos_[NUM_DAMPER];
+extern uint8_t pjon_bus_id_;
+extern uint8_t pjon_sensor_destination_id_;
 
 bool are_all_dampers_closed(void);
 bool have_dampers_reached_target(void);
@@ -122,9 +115,12 @@ void task_control_fan(void);
 void task_check_pressure(void);
 void task_pjon(void);
 void task_usbserial(void);
+void handle_damper_cmd(dampercmd_t *rxmsg);
 
-void saveSettings2EEPROM()
-void loadSettingsFromEEPROM()
-void updateSettingsFromPacket(update_settings_cmd_t *s);
+void saveSettings2EEPROM();
+void loadSettingsFromEEPROM();
+void updateSettingsFromPacket(updatesettings_t *s);
+void pjon_init();
+void pjon_change_busid(uint8_t id);
 
 #endif

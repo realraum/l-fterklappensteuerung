@@ -23,6 +23,7 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include <avr/power.h>
 #include <stdio.h>
 
@@ -65,9 +66,9 @@ void initSysClkTimer3(void)
 void initPCInterrupt(void)
 {
   //enable PinChange Interrupt
-  PCICR = 0x01
+  PCICR = (1 << PCIE0);
   //set up PB5,6,7 to toggle interrupt
-  PCMSK0 = (1<<PCINT7) || (1<<PCINT6) || (1<<PCINT5)
+  PCMSK0 = (1<<PCINT7) || (1<<PCINT6) || (1<<PCINT5);
 }
 
 bool are_all_dampers_closed()
@@ -153,18 +154,12 @@ ISR(TIMER3_COMPA_vect)
 */
 }
 
-ISR(PCINT5_vect)
+ISR(PCINT0_vect)
 {
   if (! ENDSTOP_0_ISHIGH)
     damper_endstop_reached_[0] = true;
-}
-ISR(PCINT6_vect)
-{
   if (! ENDSTOP_1_ISHIGH)
     damper_endstop_reached_[1] = true;
-}
-ISR(PCINT7_vect)
-{
   if (! ENDSTOP_2_ISHIGH)
     damper_endstop_reached_[2] = true;
 }
@@ -199,12 +194,12 @@ void task_usbserial(void)
 
 void handle_damper_cmd(dampercmd_t *rxmsg)
 {
-  switch (rxmsg->cmd->fan)
+  switch (rxmsg->fan)
   {
     case FAN_AUTO:
     case FAN_ON:
     case FAN_OFF:
-      fan_target_state_ = rxmsg->cmd->fan;
+      fan_target_state_ = rxmsg->fan;
       break;
     default:
       fan_target_state_ = FAN_OFF;
@@ -212,7 +207,7 @@ void handle_damper_cmd(dampercmd_t *rxmsg)
   }
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-    switch(rxmsg->cmd->damper[d])
+    switch(rxmsg->damper[d])
     {
       default:
       case DAMPER_CLOSED:
@@ -228,9 +223,9 @@ void handle_damper_cmd(dampercmd_t *rxmsg)
   }
 }
 
-void task_check_pressure(void)
+void task_check_pressure()
 {
-handle_serialdata
+
 }
 
 void handle_serialdata(char c)
@@ -238,12 +233,12 @@ void handle_serialdata(char c)
   switch(c) {
   case '1': case '2': case '3':
   case '4': case '5': case '6':
-  case '7': case '8': case '9': pjon_change_busid(cmd - '0'); printf("device id is now: %d\r\n", cmd - '0'); break;
+  case '7': case '8': case '9': pjon_change_busid(c - '0'); printf("device id is now: %d\r\n", c - '0'); break;
   case '!': reset2bootloader(); break;
   }
 }
 
-void main(void)
+int main()
 {
   MCUSR &= ~(1 << WDRF);
   wdt_disable();

@@ -1,7 +1,10 @@
+#include <stdio.h>
+#include "usbio.h"
 #include "Arduino.h"
 #include "PJON.h"
 #include "dampercontrol.h"
 
+PJON<SoftwareBitBang> pjonbus_;
 
 void pjon_error_handler(uint8_t code, uint8_t data)
 {
@@ -35,30 +38,28 @@ bool pjon_assert_length(uint8_t length, uint8_t expected_length)
 	}
 }
 
-void pjon_recv_handler(uint8_t length, uint8_t *payload)
+void pjon_recv_handler(uint8_t length, uint8_t *payload, uint8_t other)
 {
   if(length == 0) {
     printf("got 0 byte message...\r\n");
     return;
   }
-  led_on();
   printf("got message(%d bytes): '", length);
   for(uint16_t i = 0; i < length; ++i)
-    putchar(payload[i]);
+    printf("%c",payload[i]);
   printf("'\r\n");
   
   if (!pjon_assert_length(length, sizeof(pjon_message_t)))
   {
-  	led_off();
 		return;
   }
 
-  pjon_message_t *msg = payload;
+  pjon_message_t *msg = (pjon_message_t *) payload;
 
   switch(msg->type)
   {
   	case MSG_DAMPERCMD:
-  		handle_damper_cmd(&msg->data.dampercmd);
+  		handle_damper_cmd(&(msg->dampercmd));
   		break;
   	case MSG_PRESSUREINFO:
   		break;
@@ -72,28 +73,27 @@ void pjon_recv_handler(uint8_t length, uint8_t *payload)
   }
 
   delay(30);
-  led_off();
 }
 
 void pjon_change_busid(uint8_t id)
 {
 	pjon_bus_id_ = id;
-	pjonbus.set_id(pjon_bus_id_);
+	pjonbus_.set_id(pjon_bus_id_);
 	saveSettings2EEPROM();
 }
 
 void pjon_init()
 {
   arduino_init();
-  pjonbus.set_error(pjon_error_handler);
-  pjonbus.set_receiver(pjon_recv_handler);
-  pjonbus.set_pin(PIN_PJON);
-  pjonbus.set_id(pjon_bus_id_);
-  pjonbus.begin();
+  pjonbus_.set_error(pjon_error_handler);
+  pjonbus_.set_receiver(pjon_recv_handler);
+  pjonbus_.set_pin(PIN_PJON);
+  pjonbus_.set_id(pjon_bus_id_);
+  pjonbus_.begin();
 }
 
 void task_pjon()
 {
-    pjonbus.update();
-    pjonbus.receive(20);	
+    pjonbus_.update();
+    pjonbus_.receive(20);	
 }

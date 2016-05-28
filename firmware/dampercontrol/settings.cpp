@@ -1,52 +1,66 @@
-#include <avr.h>
 #include <avr/eeprom.h>
+#include <stdio.h>
 #include "dampercontrol.h"
 
 #define EEPROM_DATA_VERSION 0
 
+
+//read this from eeprom on start
+//update on receiving installed_msg
+//tells us which damper is actually controlled by this µC
+bool damper_installed_[NUM_DAMPER] = {false, false, false};
+
+//damper time divisor:
+//every millis that we increase a damper_state if damper is currently moving
+uint8_t damper_open_pos_[NUM_DAMPER] = {128,128,128};
+
+uint8_t pjon_bus_id_ = 9; //default ID
+uint8_t pjon_sensor_destination_id_ = 0;
+
+
 void saveSettings2EEPROM()
 {
-	uint8_t eeprom_pos=0;
+	uint8_t *eeprom_pos=0;
 	uint8_t damper_installed=0;
 
-	eeprom_write_byte((void*) eeprom_pos++, EEPROM_DATA_VERSION);
-	eeprom_write_byte((void*) eeprom_pos++, pjon_bus_id_);
-	eeprom_write_byte((void*) eeprom_pos++, NUM_DAMPER);
+	eeprom_write_byte(eeprom_pos++, EEPROM_DATA_VERSION);
+	eeprom_write_byte(eeprom_pos++, pjon_bus_id_);
+	eeprom_write_byte(eeprom_pos++, NUM_DAMPER);
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-		eeprom_write_byte((void*) eeprom_pos++, damper_open_pos_[d]);
+		eeprom_write_byte(eeprom_pos++, damper_open_pos_[d]);
 		if (damper_installed_[d])
-			damper_installed |= _BV(d)
+			damper_installed |= _BV(d);
 	}
-	eeprom_write_byte((void*) eeprom_pos++, damper_installed);
+	eeprom_write_byte(eeprom_pos++, damper_installed);
 }
 
 void loadSettingsFromEEPROM()
 {
-	uint8_t eeprom_pos=0;
+	uint8_t *eeprom_pos=0;
 
-	if (eeprom_read_byte((void*) eeprom_pos++) != EEPROM_DATA_VERSION)
+	if (eeprom_read_byte(eeprom_pos++) != EEPROM_DATA_VERSION)
 		return;
-	pjon_bus_id_ = eeprom_read_byte((void*) eeprom_pos++);
-	if (eeprom_read_byte((void*) eeprom_pos++) != NUM_DAMPER)
+	pjon_bus_id_ = eeprom_read_byte(eeprom_pos++);
+	if (eeprom_read_byte(eeprom_pos++) != NUM_DAMPER)
 		return;
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-		damper_open_pos_[d] = eeprom_read_byte((void*) eeprom_pos++);
+		damper_open_pos_[d] = eeprom_read_byte(eeprom_pos++);
 	}
-	uint8_t damper_installed = eeprom_read_byte((void*) eeprom_pos++);
+	uint8_t damper_installed = eeprom_read_byte(eeprom_pos++);
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-  	damper_installed_[d] = 0 < _BV(d) & damper_installed;
+  	damper_installed_[d] = 0 < (_BV(d) & damper_installed);
   }
 }
 
-void updateSettingsFromPacket(update_settings_t *s)
+void updateSettingsFromPacket(updatesettings_t *s)
 {
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-  	damper_installed_[d] = 0 < _BV(d) & s->settings->damper_installed;
-  	damper_open_pos_[d] =  s->settings->damper_open_pos;
+  	damper_installed_[d] = 0 < (_BV(d) & s->damper_installed);
+  	damper_open_pos_[d] =  s->damper_open_pos[d];
   }
   saveSettings2EEPROM();
 }
