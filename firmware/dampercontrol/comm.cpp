@@ -29,57 +29,62 @@ void pjon_error_handler(uint8_t code, uint8_t data)
 
 bool pjon_assert_length(uint8_t length, uint8_t expected_length)
 {
-	if (length != expected_length)
-	{
-		printf("PJON Msg got: %d, expected: %d\n", length, expected_length);
-		return false;
-	} else {
-		return true;
-	}
+  if (length != expected_length)
+  {
+    printf("PJON Msg got: %d, expected: %d\n", length, expected_length);
+    return false;
+  } else {
+    return true;
+  }
 }
 
-void pjon_recv_handler(uint8_t length, uint8_t *payload, uint8_t other)
+void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 {
+  printf("got message(%d bytes) from %d: '", length, id);
   if(length == 0) {
-    printf("got 0 byte message...\r\n");
+    printf("\r\n");
     return;
-  }
-  printf("got message(%d bytes): '", length);
+  }  
   for(uint16_t i = 0; i < length; ++i)
     printf("%c",payload[i]);
   printf("'\r\n");
   
   if (!pjon_assert_length(length, sizeof(pjon_message_t)))
   {
-		return;
+    return;
   }
 
   pjon_message_t *msg = (pjon_message_t *) payload;
 
   switch(msg->type)
   {
-  	case MSG_DAMPERCMD:
-  		handle_damper_cmd(&(msg->dampercmd));
-  		break;
-  	case MSG_PRESSUREINFO:
-  		break;
-  	case MSG_ERROR:
-  		break;
-  	case MSG_UPDATESETTINGS:
-  		break;
-  	default:
-  		printf("Unknown MSG type %d\n", payload[0]);
-  		break;
+    case MSG_DAMPERCMD:
+      handle_damper_cmd(&(msg->dampercmd));
+      break;
+    case MSG_PRESSUREINFO:
+      break;
+    case MSG_ERROR:
+      break;
+    case MSG_UPDATESETTINGS:
+      break;
+    default:
+      printf("Unknown MSG type %d\n", payload[0]);
+      break;
   }
+}
 
-  delay(30);
+void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
+{
+  pjon_recv_handler(pjon_bus_id_, payload, length);
+  //hope we did not mangle the payload
+  pjonbus_.send(BROADCAST, (const char*) payload, length);
 }
 
 void pjon_change_busid(uint8_t id)
 {
-	pjon_bus_id_ = id;
-	pjonbus_.set_id(pjon_bus_id_);
-	saveSettings2EEPROM();
+  pjon_bus_id_ = id;
+  pjonbus_.set_id(pjon_bus_id_);
+  saveSettings2EEPROM();
 }
 
 void pjon_init()
@@ -95,5 +100,5 @@ void pjon_init()
 void task_pjon()
 {
     pjonbus_.update();
-    pjonbus_.receive(20);	
+    pjonbus_.receive(20); 
 }

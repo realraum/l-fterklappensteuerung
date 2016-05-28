@@ -71,6 +71,7 @@ void initPCInterrupt(void)
   PCMSK0 = (1<<PCINT7) || (1<<PCINT6) || (1<<PCINT5);
 }
 
+//note: not installed dampers are always closed
 bool are_all_dampers_closed()
 {
   bool rv = true;
@@ -91,13 +92,12 @@ bool have_dampers_reached_target()
   return rv;
 }
 
-// TODO Set a bit if photoelectric fork x went low
+// ISR sets true if photoelectric fork x went low
 bool damper_endstop_reached_[NUM_DAMPER];
 
 //return yes if the endstop of damperX was toggled since last time we asked
 bool did_damper_pass_endstop(uint8_t damperid)
 {
-  //TODO
   bool rv = damper_endstop_reached_[damperid];
   //reset endstop bit, but only if we saw it set (to guard against race condition)
   //the assumption being, that it could just now have been set to true
@@ -186,12 +186,6 @@ void task_control_fan()
   }
 }
 
-void task_usbserial(void)
-{
-
-}
-
-
 void handle_damper_cmd(dampercmd_t *rxmsg)
 {
   switch (rxmsg->fan)
@@ -228,13 +222,64 @@ void task_check_pressure()
 
 }
 
+void printSettings()
+{
+  printf("=== State ===\r\n");
+  printf("PJON device id: %d\r\n", pjon_bus_id_);
+  printf("PJON sensor destid: %d\r\n", pjon_sensor_destination_id_);
+  printf("#Dampers: %d\r\n", NUM_DAMPER);
+  for (uint8_t d=0; d<NUM_DAMPER; d++) {
+    printf("Damper%d: %s installed\r\n", d, (damper_installed_[d])?"is":"NOT");
+    printf("\t pos: consid. open at: %d, current: %d, target: %d\r\n", damper_open_pos_[d],damper_states_[d],damper_target_states_[d]);
+    printf("\t endstop: %s\r\n", (damper_endstop_reached_[d])?"closed":"open");
+  }
+  printf("Fan is %s and set to %d\r\n", (fan_state_)?"on":"off", fan_target_state_);
+}
+
 void handle_serialdata(char c)
 {
-  switch(c) {
-  case '1': case '2': case '3':
-  case '4': case '5': case '6':
-  case '7': case '8': case '9': pjon_change_busid(c - '0'); printf("device id is now: %d\r\n", c - '0'); break;
-  case '!': reset2bootloader(); break;
+  static next_char_state_t next_char = CCMD;
+  static uint8_t read_num_chars = 0;
+  static uint8_t msg_len = 0;
+  static uint8_t msg_buf[0xff];
+
+  switch (next_char) {
+    default:
+    case CCMD:
+      switch(c) {
+        case 'P': next_char = CDEVID; break;
+        case 'I': next_char = CINSTALLEDDAMPERS; break;
+        case '>': next_char = CPKTLEN; break;
+        case 's': printSettings(); break;
+        case '!': reset2bootloader(); break;
+      }
+    break;
+    case CDEVID:
+      pjon_change_busid(c - '0');
+      printf("device id is now: %d\r\n", c - '0');
+    break;
+    case CINSTALLEDDAMPERS:
+      updateInstalledDampersFromChar(c - '0');
+      printf("installed dampers updated\r\n");
+    break;
+    case CPKTLEN:
+      if (c == 0) {
+        next_char = CCMD;
+        break;
+      }
+      read_num_chars = c;
+      msg_len = 0;
+      next_char = CPKT;
+      break;
+    case CPKT:
+      msg_buf[msg_len++] = c;
+      read_num_chars--;
+      if (read_num_chars == 0)
+      {
+        pjon_inject_broadcast_msg(msg_len, msg_buf);
+        next_char = CCMD;
+      }
+      break;
   }
 }
 
@@ -268,8 +313,7 @@ int main()
     usbio_task();
     task_check_pressure();
     task_pjon();
-    task_usbserial();
-    // task_control_dampers();
+    // task_control_dampers(); // called by timer, do not call from loop
     task_control_fan();
   }
 }

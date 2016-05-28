@@ -67,6 +67,8 @@ enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETT
 enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN};
 enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO};
 enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
+enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTLEN, CPKT};
+
 
 typedef struct {
   uint8_t damper[NUM_DAMPER];
@@ -83,11 +85,7 @@ typedef  struct {
   uint8_t errortype;
 } errorinfo_t;
 
-//todo split this:
-//damper_installed should only be settable via serial
-//damper_open_pos can be setable via PJON
 typedef  struct {
-  uint8_t damper_installed;
   uint8_t damper_open_pos[NUM_DAMPER];
 } updatesettings_t;
 
@@ -120,7 +118,9 @@ void handle_damper_cmd(dampercmd_t *rxmsg);
 void saveSettings2EEPROM();
 void loadSettingsFromEEPROM();
 void updateSettingsFromPacket(updatesettings_t *s);
+void updateInstalledDampersFromChar(uint8_t damper_installed);
 void pjon_init();
 void pjon_change_busid(uint8_t id);
+void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 
 #endif
