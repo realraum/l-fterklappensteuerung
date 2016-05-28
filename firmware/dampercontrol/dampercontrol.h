@@ -77,7 +77,7 @@ typedef struct {
 
 typedef  struct {
   uint8_t sensorid;
-  uint16_t mBar;
+  double mBar;
 } pressureinfo_t;
 
 typedef  struct {
@@ -102,6 +102,7 @@ typedef struct {
 
 
 extern bool damper_installed_[NUM_DAMPER];
+extern bool sensor_installed_[NUM_DAMPER];
 extern uint8_t damper_open_pos_[NUM_DAMPER];
 extern uint8_t pjon_bus_id_;
 extern uint8_t pjon_sensor_destination_id_;
@@ -122,5 +123,10 @@ void updateInstalledDampersFromChar(uint8_t damper_installed);
 void pjon_init();
 void pjon_change_busid(uint8_t id);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
+void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure);
+
+void pressure_sensors_init();
+void task_check_pressure();
+
 
 #endif

@@ -22,7 +22,7 @@
 
 NAME := dampercontrol
 BOARD_TYPE := teensy2
-CXX_OBJ := main.o settings.o comm.o
+CXX_OBJ := main.o settings.o comm.o pressure.o
 LIBS := util led lufa-descriptor-usbserial usbio
 CXX_LIBS := arduino-stub
 EXTERNAL_LIBS := lufa pjon

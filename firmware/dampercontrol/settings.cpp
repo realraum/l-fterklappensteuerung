@@ -9,6 +9,7 @@
 //update on receiving installed_msg
 //tells us which damper is actually controlled by this µC
 bool damper_installed_[NUM_DAMPER] = {false, false, false};
+bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 
 //damper time divisor:
 //every millis that we increase a damper_state if damper is currently moving

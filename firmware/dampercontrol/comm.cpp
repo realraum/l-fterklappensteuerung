@@ -80,6 +80,15 @@ void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
   pjonbus_.send(BROADCAST, (const char*) payload, length);
 }
 
+void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure)
+{
+  pjon_message_t msg;
+  msg.type = MSG_PRESSUREINFO;
+  msg.pressureinfo.sensorid = sensorid;
+  msg.pressureinfo.mBar = pressure;
+  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, sizeof(pressureinfo_t)+1);
+}
+
 void pjon_change_busid(uint8_t id)
 {
   pjon_bus_id_ = id;

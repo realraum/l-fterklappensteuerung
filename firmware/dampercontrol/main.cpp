@@ -217,11 +217,6 @@ void handle_damper_cmd(dampercmd_t *rxmsg)
   }
 }
 
-void task_check_pressure()
-{
-
-}
-
 void printSettings()
 {
   printf("=== State ===\r\n");
@@ -232,6 +227,7 @@ void printSettings()
     printf("Damper%d: %s installed\r\n", d, (damper_installed_[d])?"is":"NOT");
     printf("\t pos: consid. open at: %d, current: %d, target: %d\r\n", damper_open_pos_[d],damper_states_[d],damper_target_states_[d]);
     printf("\t endstop: %s\r\n", (damper_endstop_reached_[d])?"closed":"open");
+    printf("Pressure Sensor%d: %s installed\r\n", d, (sensor_installed_[d])?"is":"NOT");
   }
   printf("Fan is %s and set to %d\r\n", (fan_state_)?"on":"off", fan_target_state_);
 }
@@ -296,6 +292,7 @@ int main()
   // init
   loadSettingsFromEEPROM();
   pjon_init();
+  pressure_sensors_init();
 
 
   // loop
