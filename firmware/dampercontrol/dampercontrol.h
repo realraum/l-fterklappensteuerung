@@ -5,33 +5,63 @@
 /* Hardware: AVR ATMEGA32U4
  * 
  * ==== PINS ====
- * PB5 .. Endstop 0  (PCINT5)
- * PB6 .. Endstop 1  (PCINT6)
- * PB7 .. Endstop 2  (PCINT7)
+ * PB0... SPI Sensor0 CS
+ * PB1... SPI CLK
+ * PB2... SPI MOSI
+ * PB3... SPI MISO
+ * PB4 .. ENDSTOP_ISHIGH 0  (PCINT4)
+ * PB5 .. Endstop 1  (PCINT5)
+ * PB6 .. Endstop 2  (PCINT6)
+ * PB7... SPI Sensor1 CS
+ * PC6... SPI Sensor2 CS
  * PD0... Damper Motor 0
  * PD1... Damper Motor 1
  * PD2... Damper Motor 2
- * PF0... Ventilation Fan
- * ???... PJON Pin
- * ???... SPI MOSI
- * ???... SPI MISO
- * ???... SPI CLK
- * ???... SPI Sensor0 CS
- * ???... SPI Sensor1 CS
- * ???... SPI Sensor2 CS
+ * PD3... PJON Pin
+ * PD6... Ventilation Fan
+ * PF0... =ADC0 needed by PJON
 */
 
+#define PIN_CS_S0 PB0
+#define REG_CS_S0 PINB
+#define PIN_CS_S1 PB7
+#define REG_CS_S1 PINB
+#define PIN_CS_S2 PC6
+#define REG_CS_S2 PINC
+#define PIN_ENDSTOP_0 PB4
+#define REG_ENDSTOP_0 PINB
+#define PIN_ENDSTOP_1 PB5
+#define REG_ENDSTOP_1 PINB
+#define PIN_ENDSTOP_2 PB6
+#define REG_ENDSTOP_2 PINB
+#define PIN_DAMPER_0 PD0
+#define REG_DAMPER_0 PIND
+#define PIN_DAMPER_1 PD1
+#define REG_DAMPER_1 PIND
+#define PIN_DAMPER_2 PD2
+#define REG_DAMPER_2 PIND
+#define PIN_FAN PD6
+#define REG_FAN PIND
+
+//aka PD3 INT3
+// see ../contrib/avr-utils/lib/arduino-leonardo/arduino_pins.h
 #define PIN_PJON 1
 
-#define PIN_HIGH(PORT, PIN) PORT |= (1 << PIN)
-#define PIN_LOW(PORT, PIN) PORT &= ~(1 << PIN)
-#define PINMODE_OUTPUT PIN_HIGH  //just use DDR instead of PORT
-#define PINMODE_INPUT PIN_LOW  //just use DDR instead of PORT
+#define PINREG(x) x
+#define DDRREG(x) *(&x+1)
+#define PORTREG(x) *(&x+2)
+
+#define PIN_HIGH(REG, PIN) *(&REG+2) |= (1 << PIN)
+#define PIN_LOW(REG, PIN) *(&REG+2) &= ~(1 << PIN)
+#define PINMODE_OUTPUT(REG, PIN) *(&REG+1) |= (1 << PIN)  //just use DDR instead of PORT
+#define PINMODE_INPUT(REG, PIN) *(&REG+1) &= ~(1 << PIN)  //just use DDR instead of PORT
+#define IS_HIGH(REG,PIN) REG & (1 << PIN)
 
 #define OP_SETBIT |=
 #define OP_CLEARBIT &= ~
 #define OP_CHECK &
 #define PIN_SW(PORTDDRREG, PIN, OP) PORTDDRREG OP (1 << PIN)
+
 
 #define HIGHv OP_SETBIT
 #define LOWv OP_CLEARBIT
@@ -39,22 +69,27 @@
 //with F_CPU = 16MHz and TIMER3 Prescaler set to /1024, TIMER3 increments with f = 16KHz. Thus if TIMER3 reaches 16, 1ms has passed.
 #define T3_MS     *16
 //set TICK_TIME to 1/20 of a second
-#define TICK_DURATION_IN_MS 50
+#define TICK_DURATION_IN_MS 10
 #define TICK_TIME (TICK_DURATION_IN_MS T3_MS)
 
 ///// HARDWARE CONTROL DEFINES /////
 
-#define ENDSTOP_0_ISHIGH PIN_SW(PORTB,PB5,OP_CHECK)
-#define ENDSTOP_1_ISHIGH PIN_SW(PORTB,PB6,OP_CHECK)
-#define ENDSTOP_2_ISHIGH PIN_SW(PORTB,PB7,OP_CHECK)
-#define ENDSTOP_ISHIGH(x) PIN_SW(PORTB,(PB5+x),OP_CHECK)
+#define ENDSTOP_0_ISHIGH (PINREG(REG_ENDSTOP_0) & _BV(PIN_ENDSTOP_0))
+#define ENDSTOP_1_ISHIGH (PINREG(REG_ENDSTOP_1) & _BV(PIN_ENDSTOP_1))
+#define ENDSTOP_2_ISHIGH (PINREG(REG_ENDSTOP_2) & _BV(PIN_ENDSTOP_2))
+#define ENDSTOP_ISHIGH(x) (PINREG(REG_ENDSTOP_0) & _BV(PIN_ENDSTOP_0 + x))
 
-#define DAMPER_MOTOR_RUN(x) PIN_SW(PORTB,(PD0+x),OP_SETBIT)
-#define DAMPER_MOTOR_STOP(x) PIN_SW(PORTB,(PD0+x),OP_CLEARBIT)
+#define DAMPER_MOTOR_RUN(x) PORTREG(REG_DAMPER_0) |= _BV(PIN_DAMPER_0 + x)
+#define DAMPER_MOTOR_STOP(x) PORTREG(REG_DAMPER_0) &= ~_BV(PIN_DAMPER_0 + x)
 
-#define FAN_RUN  PIN_SW(PORTF,PF0,OP_SETBIT)
-#define FAN_STOP PIN_SW(PORTF,PF0,OP_CLEARBIT)
-#define FAN_ISRUNNING PIN_SW(PORTF,PF0,OP_CHECK)
+#define FAN_RUN  PIN_SW(PORTD,PD6,OP_SETBIT)
+#define FAN_STOP PIN_SW(PORTD,PD6,OP_CLEARBIT)
+#define FAN_ISRUNNING (PIN_SW(PIND,PD6,OP_CHECK))
+
+#define CS_SENSOR_0(LOWHIGH) (PIN_SW(PORTB,PB0,LOWHIGH))
+#define CS_SENSOR_1(LOWHIGH) (PIN_SW(PORTB,PB7,LOWHIGH))
+#define CS_SENSOR_2(LOWHIGH) (PIN_SW(PORTC,PC6,LOWHIGH))
+#define CS_SENSOR(x,LOWHIGH) CS_SENSOR_#x(LOWHIGH)
 
 
 /// GLOBALS ///

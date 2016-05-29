@@ -678,7 +678,6 @@ Wire Wire Line
 	6450 2200 6750 2200
 Text Label 6750 2000 2    60   ~ 0
 PS1SS
-NoConn ~ 6450 2000
 $Comp
 L CONN_01X04 P?
 U 1 1 5741E64B
@@ -731,13 +730,13 @@ Connection ~ 6600 2200
 Connection ~ 6600 1700
 Connection ~ 6550 2100
 Connection ~ 6550 1600
-Text Label 6450 2500 0    60   ~ 0
+Text Label 6450 2400 0    60   ~ 0
 EndstopDamper1
-Text Label 6450 2600 0    60   ~ 0
+Text Label 6450 2500 0    60   ~ 0
 EndstopDamper2
-Text Label 6450 2700 0    60   ~ 0
+Text Label 6450 2600 0    60   ~ 0
 EndstopDamper3
-Text Label 6450 4400 0    60   ~ 0
+Text Label 6450 3800 0    60   ~ 0
 FAN
 Text Label 6450 3400 0    60   ~ 0
 Damper3
@@ -769,4 +768,12 @@ F 3 "" H 4700 900 50  0000 C CNN
 $EndComp
 Text Label 4700 800  2    60   ~ 0
 PJON
+Text Label 6450 3500 0    60   ~ 0
+PJON
+Wire Wire Line
+	6450 2000 6750 2000
+Text Label 6450 2700 0    60   ~ 0
+PS2SS
+Text Label 6450 2900 0    60   ~ 0
+PS3SS
 $EndSCHEMATC

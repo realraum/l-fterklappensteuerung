@@ -46,29 +46,33 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
     return;
   }  
   for(uint16_t i = 0; i < length; ++i)
-    printf("%c",payload[i]);
+    printf("%02x ",payload[i]);
   printf("'\r\n");
-  
-  if (!pjon_assert_length(length, sizeof(pjon_message_t)))
-  {
-    return;
-  }
 
   pjon_message_t *msg = (pjon_message_t *) payload;
 
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
+      printf("got msg_dampercmd\r\n");
+      if (!pjon_assert_length(length, sizeof(dampercmd_t)+1)) { break; }
       handle_damper_cmd(&(msg->dampercmd));
       break;
     case MSG_PRESSUREINFO:
+      printf("got MSG_PRESSUREINFO\r\n");
+      if (!pjon_assert_length(length, sizeof(pressureinfo_t)+1)) { break; }
       break;
     case MSG_ERROR:
+      printf("got MSG_ERROR\r\n");
+      if (!pjon_assert_length(length, sizeof(errorinfo_t)+1)) { break; }
       break;
     case MSG_UPDATESETTINGS:
+      printf("got MSG_UPDATESETTINGS\r\n");
+      if (!pjon_assert_length(length, sizeof(updatesettings_t)+1)) { break; }
+      updateSettingsFromPacket(&(msg->updatesettings));
       break;
     default:
-      printf("Unknown MSG type %d\n", payload[0]);
+      printf("Unknown MSG type %d\n", msg->type);
       break;
   }
 }

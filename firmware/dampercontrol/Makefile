@@ -49,4 +49,4 @@ LUFA_COMPONENTS := USB USBCLASS ADC
 include $(SPREADAVR_PATH)/include.mk
 
 RESET_FUNC := $(SPREADAVR_PATH)/tools/reset_lufa_cdc
-RESET_PARAM := 'r'
+RESET_PARAM := '!'

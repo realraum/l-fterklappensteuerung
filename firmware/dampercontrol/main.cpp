@@ -67,8 +67,45 @@ void initPCInterrupt(void)
 {
   //enable PinChange Interrupt
   PCICR = (1 << PCIE0);
-  //set up PB5,6,7 to toggle interrupt
-  PCMSK0 = (1<<PCINT7) || (1<<PCINT6) || (1<<PCINT5);
+  //set up Endstop PinChange Interrupts toggle interrupt
+  PCMSK0 = (1<<PCINT4) || (1<<PCINT5) || (1<<PCINT6);
+}
+
+void initPINs()
+{
+  //PJON pin
+  //TODO
+  //endstop inputs
+  PINMODE_INPUT(REG_ENDSTOP_0,PIN_ENDSTOP_0);
+  PINMODE_INPUT(REG_ENDSTOP_1,PIN_ENDSTOP_1);
+  PINMODE_INPUT(REG_ENDSTOP_2,PIN_ENDSTOP_2);
+  //enable internal pullups
+  PIN_HIGH(REG_ENDSTOP_0,PIN_ENDSTOP_0);
+  PIN_HIGH(REG_ENDSTOP_1,PIN_ENDSTOP_1);
+  PIN_HIGH(REG_ENDSTOP_2,PIN_ENDSTOP_2);
+  //set damper and fan motor as output
+  PINMODE_OUTPUT(REG_DAMPER_0,PIN_DAMPER_0);
+  PINMODE_OUTPUT(REG_DAMPER_2,PIN_DAMPER_1);
+  PINMODE_OUTPUT(REG_DAMPER_2,PIN_DAMPER_2);
+  //PD3 is pjon, maybe it can use the INT4 someday
+  PINMODE_OUTPUT(REG_FAN,PIN_FAN); //FAN
+  DAMPER_MOTOR_STOP(0);
+  DAMPER_MOTOR_STOP(1);
+  DAMPER_MOTOR_STOP(2);
+  FAN_STOP;
+}
+
+void initEndstops()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (ENDSTOP_ISHIGH(d))
+    {
+      //if not at endstop on boot, assume we are open
+      damper_states_[d] = damper_open_pos_[d];
+      damper_target_states_[d] = damper_open_pos_[d];
+    }
+  }    
 }
 
 //note: not installed dampers are always closed
@@ -122,8 +159,39 @@ bool did_damper_pass_endstop(uint8_t damperid)
 
 */
 
+//called by pinchange interrupt
+void task_check_endstops()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (ENDSTOP_ISHIGH(d) == 0)
+    {
+      damper_endstop_reached_[d] = true;
+      printf("endstop %d reached\r\n", d);
+    }
+  }  
+}
+
+void task_simulate_pinchange_interrupt()
+{
+  bool interrupt=false;
+  static uint8_t last_state[3] = {0,0,0};
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    uint8_t curstate = ENDSTOP_ISHIGH(d);
+    if (curstate != last_state[d])
+    {
+      printf("pinchange on endstop %d, state:%d\r\n", d, curstate);
+      interrupt=true;
+      last_state[d]=curstate;
+    }
+  }
+  if (interrupt)
+    task_check_endstops();
+}
+
 //called by timer
-inline void task_control_dampers()
+void task_control_dampers()
 {
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
@@ -137,8 +205,10 @@ inline void task_control_dampers()
     {
       DAMPER_MOTOR_RUN(d);
       damper_states_[d]++;
+      // printf("Motor %d Run @%d\r\n", d, damper_states_[d]);
     } else {
       DAMPER_MOTOR_STOP(d);
+      // printf("Motor %d Stop @%d\r\n", d, damper_states_[d]);
     }
   }
 }
@@ -156,12 +226,7 @@ ISR(TIMER3_COMPA_vect)
 
 ISR(PCINT0_vect)
 {
-  if (! ENDSTOP_0_ISHIGH)
-    damper_endstop_reached_[0] = true;
-  if (! ENDSTOP_1_ISHIGH)
-    damper_endstop_reached_[1] = true;
-  if (! ENDSTOP_2_ISHIGH)
-    damper_endstop_reached_[2] = true;
+  task_check_endstops();
 }
 
 /// TASKS
@@ -226,7 +291,7 @@ void printSettings()
   for (uint8_t d=0; d<NUM_DAMPER; d++) {
     printf("Damper%d: %s installed\r\n", d, (damper_installed_[d])?"is":"NOT");
     printf("\t pos: consid. open at: %d, current: %d, target: %d\r\n", damper_open_pos_[d],damper_states_[d],damper_target_states_[d]);
-    printf("\t endstop: %s\r\n", (damper_endstop_reached_[d])?"closed":"open");
+    printf("\t endstop lightbeam: %s\r\n", (ENDSTOP_ISHIGH(d))?"interrupted":"uninterrupted");
     printf("Pressure Sensor%d: %s installed\r\n", d, (sensor_installed_[d])?"is":"NOT");
   }
   printf("Fan is %s and set to %d\r\n", (fan_state_)?"on":"off", fan_target_state_);
@@ -245,6 +310,9 @@ void handle_serialdata(char c)
       switch(c) {
         case 'P': next_char = CDEVID; break;
         case 'I': next_char = CINSTALLEDDAMPERS; break;
+        case 'o': damper_target_states_[0] = damper_open_pos_[0]; printf("opening Damper0\r\n"); break;
+        case 'c': damper_target_states_[0] = 0; printf("closing Damper0\r\n"); break;
+        case 'h': damper_target_states_[0] = damper_open_pos_[0]/2; printf("half-open Damper0\r\n"); break;
         case '>': next_char = CPKTLEN; break;
         case 's': printSettings(); break;
         case '!': reset2bootloader(); break;
@@ -253,10 +321,12 @@ void handle_serialdata(char c)
     case CDEVID:
       pjon_change_busid(c - '0');
       printf("device id is now: %d\r\n", c - '0');
+      next_char = CCMD;
     break;
     case CINSTALLEDDAMPERS:
       updateInstalledDampersFromChar(c - '0');
       printf("installed dampers updated\r\n");
+      next_char = CCMD;
     break;
     case CPKTLEN:
       if (c == 0) {
@@ -290,8 +360,12 @@ int main()
   sei();
 
   // init
+  pjon_init(); //PJON first since it calls arduino init which might do who knows what
+  initPINs();
+  initSysClkTimer3();
+  //initPCInterrupt();
+  initEndstops();
   loadSettingsFromEEPROM();
-  pjon_init();
   pressure_sensors_init();
 
 
@@ -310,7 +384,8 @@ int main()
     usbio_task();
     task_check_pressure();
     task_pjon();
-    // task_control_dampers(); // called by timer, do not call from loop
+    //task_control_dampers(); // called by timer, do not call from loop
+    task_simulate_pinchange_interrupt();
     task_control_fan();
   }
 }

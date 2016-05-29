@@ -13,7 +13,7 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 
 //damper time divisor:
 //every millis that we increase a damper_state if damper is currently moving
-uint8_t damper_open_pos_[NUM_DAMPER] = {128,128,128};
+uint8_t damper_open_pos_[NUM_DAMPER] = {90,90,90};
 
 uint8_t pjon_bus_id_ = 9; //default ID
 uint8_t pjon_sensor_destination_id_ = 0;
@@ -71,4 +71,5 @@ void updateInstalledDampersFromChar(uint8_t damper_installed)
   {
     damper_installed_[d] = 0 < (_BV(d) & damper_installed);
   }
+  saveSettings2EEPROM();
 }
