@@ -66,9 +66,9 @@ void initSysClkTimer3(void)
 void initPCInterrupt(void)
 {
   //enable PinChange Interrupt
-  PCICR = (1 << PCIE0);
+  PCICR = _BV(PCIE0);
   //set up Endstop PinChange Interrupts toggle interrupt
-  PCMSK0 = (1<<PCINT4) || (1<<PCINT5) || (1<<PCINT6);
+  PCMSK0 = (1<<PCINT4) | (1<<PCINT5) | (1<<PCINT6);
 }
 
 void initPINs()
