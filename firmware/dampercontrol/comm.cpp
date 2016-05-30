@@ -38,10 +38,33 @@ bool pjon_assert_length(uint8_t length, uint8_t expected_length)
   }
 }
 
+uint8_t pjon_type_to_msg_length(uint8_t type)
+{
+  switch(type)
+  {
+    case MSG_DAMPERCMD:
+      return sizeof(dampercmd_t)+1;
+      break;
+    case MSG_PRESSUREINFO:
+      return sizeof(pressureinfo_t)+1;
+      break;
+    case MSG_ERROR:
+      return sizeof(errorinfo_t)+1;
+      break;
+    case MSG_UPDATESETTINGS:
+      return sizeof(updatesettings_t)+1;
+      break;
+    default:
+      return 0;
+      break;
+  }
+}
+
 void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 {
   printf("got message(%d bytes) from %d: '", length, id);
-  if(length == 0) {
+  if(length < 1) {
+    //accepting no messages without a type
     printf("\r\n");
     return;
   }  
@@ -51,24 +74,22 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 
   pjon_message_t *msg = (pjon_message_t *) payload;
 
+  if (!pjon_assert_length(length, pjon_type_to_msg_length(msg->type)))
+  { return; }
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
       printf("got msg_dampercmd\r\n");
-      if (!pjon_assert_length(length, sizeof(dampercmd_t)+1)) { break; }
       handle_damper_cmd(&(msg->dampercmd));
       break;
     case MSG_PRESSUREINFO:
       printf("got MSG_PRESSUREINFO\r\n");
-      if (!pjon_assert_length(length, sizeof(pressureinfo_t)+1)) { break; }
       break;
     case MSG_ERROR:
       printf("got MSG_ERROR\r\n");
-      if (!pjon_assert_length(length, sizeof(errorinfo_t)+1)) { break; }
       break;
     case MSG_UPDATESETTINGS:
       printf("got MSG_UPDATESETTINGS\r\n");
-      if (!pjon_assert_length(length, sizeof(updatesettings_t)+1)) { break; }
       updateSettingsFromPacket(&(msg->updatesettings));
       break;
     default:
@@ -90,7 +111,7 @@ void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure)
   msg.type = MSG_PRESSUREINFO;
   msg.pressureinfo.sensorid = sensorid;
   msg.pressureinfo.mBar = pressure;
-  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, sizeof(pressureinfo_t)+1);
+  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 void pjon_change_busid(uint8_t id)
