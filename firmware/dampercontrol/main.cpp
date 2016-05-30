@@ -277,6 +277,7 @@ void task_check_damper_state_overflow()
   }
 }
 
+enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTLEN, CPKT};
 
 void handle_damper_cmd(dampercmd_t *rxmsg)
 {

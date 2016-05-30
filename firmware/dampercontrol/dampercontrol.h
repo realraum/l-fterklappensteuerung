@@ -102,7 +102,6 @@ enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETT
 enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN};
 enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO};
 enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
-enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTLEN, CPKT};
 
 
 typedef struct {
