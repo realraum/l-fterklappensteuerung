@@ -9,7 +9,7 @@
  * PB1... SPI CLK
  * PB2... SPI MOSI
  * PB3... SPI MISO
- * PB4 .. ENDSTOP_ISHIGH 0  (PCINT4)
+ * PB4 .. Endstop 0  (PCINT4)
  * PB5 .. Endstop 1  (PCINT5)
  * PB6 .. Endstop 2  (PCINT6)
  * PB7... SPI Sensor1 CS
@@ -18,7 +18,7 @@
  * PD1... Damper Motor 1
  * PD2... Damper Motor 2
  * PD3... PJON Pin
- * PD6... Ventilation Fan
+ * PD6... Ventilation Fan (Teensy2LED)
  * PF0... =ADC0 needed by PJON
 */
 
@@ -69,7 +69,7 @@
 //with F_CPU = 16MHz and TIMER3 Prescaler set to /1024, TIMER3 increments with f = 16KHz. Thus if TIMER3 reaches 16, 1ms has passed.
 #define T3_MS     *16
 //set TICK_TIME to 1/20 of a second
-#define TICK_DURATION_IN_MS 10
+#define TICK_DURATION_IN_MS 8
 #define TICK_TIME (TICK_DURATION_IN_MS T3_MS)
 
 ///// HARDWARE CONTROL DEFINES /////

@@ -95,7 +95,7 @@ void initPINs()
   FAN_STOP;
 }
 
-void initEndstops()
+void initGuessPositionFromEndstop()
 {
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
@@ -104,6 +104,9 @@ void initEndstops()
       //if not at endstop on boot, assume we are open
       damper_states_[d] = damper_open_pos_[d];
       damper_target_states_[d] = damper_open_pos_[d];
+    } else {
+      damper_states_[d] = 0;
+      damper_target_states_[d] = 0;      
     }
   }    
 }
@@ -167,7 +170,6 @@ void task_check_endstops()
     if (ENDSTOP_ISHIGH(d) == 0)
     {
       damper_endstop_reached_[d] = true;
-      printf("endstop %d reached\r\n", d);
     }
   }  
 }
@@ -198,15 +200,19 @@ void task_control_dampers()
     if (!damper_installed_[d])
       continue;
 
+    //here we self-synchronize the position time counter
     if (did_damper_pass_endstop(d))
       damper_states_[d] = 0;
 
     if (damper_states_[d] != damper_target_states_[d])
     {
+      //move motor
       DAMPER_MOTOR_RUN(d);
+      //increment position time counter if we are moving
       damper_states_[d]++;
       // printf("Motor %d Run @%d\r\n", d, damper_states_[d]);
     } else {
+      //stop motor
       DAMPER_MOTOR_STOP(d);
       // printf("Motor %d Stop @%d\r\n", d, damper_states_[d]);
     }
@@ -215,7 +221,7 @@ void task_control_dampers()
 
 ISR(TIMER3_COMPA_vect)
 {
-  //called every TIME_TICK (aka 50ms)
+  //called every TIME_TICK (aka 8ms)
   task_control_dampers();
   //set up "clock" comparator for next tick
   OCR3A = (OCR3A + TICK_TIME) & 0xFFFF;
@@ -224,6 +230,7 @@ ISR(TIMER3_COMPA_vect)
 */
 }
 
+//https://sites.google.com/site/qeewiki/books/avr-guide/external-interrupts-on-the-atmega328
 ISR(PCINT0_vect)
 {
   task_check_endstops();
@@ -357,15 +364,15 @@ int main()
   cpu_init();
   led_init();
   usbio_init();
-  sei();
 
   // init
+  loadSettingsFromEEPROM();
   pjon_init(); //PJON first since it calls arduino init which might do who knows what
   initPINs();
+  initGuessPositionFromEndstop();
   initSysClkTimer3();
-  //initPCInterrupt();
-  initEndstops();
-  loadSettingsFromEEPROM();
+  initPCInterrupt();
+  sei();
   pressure_sensors_init();
 
 
@@ -384,8 +391,8 @@ int main()
     usbio_task();
     task_check_pressure();
     task_pjon();
-    //task_control_dampers(); // called by timer, do not call from loop
-    task_simulate_pinchange_interrupt();
+    //task_control_dampers(); // called by timer in precise intervals, do not call from loop
+    //task_simulate_pinchange_interrupt();
     task_control_fan();
   }
 }

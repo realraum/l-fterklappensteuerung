@@ -13,7 +13,16 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 
 //damper time divisor:
 //every millis that we increase a damper_state if damper is currently moving
-uint8_t damper_open_pos_[NUM_DAMPER] = {90,90,90};
+//128 is a good value for TICK_DURATION_IN_MS == 7
+//103 is a good value for TICK_DURATION_IN_MS == 8
+//90 is a good value for TICK_DURATION_IN_MS == 10
+// in Theory it would be great to time the half-rotations of the damper perfectly
+// so that we would not have to rely on the endstop.
+// unfortunately time and damper position correlate very poorly
+// so this does not work out. Thus we have to choose a TICK_DURATION_IN_MS > 7 and a damper_open_pos < 128.
+// This way we can at least garantee that we always stop at the endstop (if the endstop works) if we close.
+// Otherwise the damper_state_ position might overflow and reach 0 before we are at the endstop.
+uint8_t damper_open_pos_[NUM_DAMPER] = {103,103,103};
 
 uint8_t pjon_bus_id_ = 9; //default ID
 uint8_t pjon_sensor_destination_id_ = 0;
