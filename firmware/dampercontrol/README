@@ -1,4 +1,10 @@
-===== Injecting Test PJON Packets ======
+===== Status =====
+
+It works very well.
+
+Pressure Sensor code needs to be added. Work on adding bmp180 lib to avr-utils needs to be finished.
+
+===== Testing: Injecting Test PJON Packets ======
 
 ## Close Damper 0, Open Damers 1,2 and set FAN to Auto
 
