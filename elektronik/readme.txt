@@ -46,3 +46,13 @@ SBL10L25 od. Ähnliches
 
 ===== Drucksensor =====
 BMP280
+
+
+==== TODO ====
+
+test SSR directly am Teensy:
+
+SSR LED pulls <=19mA per test and 40mA per datasheet
+We _could_probably connect it directly to the Teensy via 12 Ohm R
+or maybe 47Ohm R which means 2V drop on 40mA and 0.5V drop on 10mA so we may naturally limit the current.
+Relay LED minimum Voltage is 3V
