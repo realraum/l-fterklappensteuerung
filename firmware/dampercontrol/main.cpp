@@ -24,6 +24,7 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
+#include <util/delay.h>
 #include <avr/power.h>
 #include <stdio.h>
 
@@ -48,6 +49,8 @@ bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
 bool fan_state_ = false;
 uint8_t fan_target_state_ = FAN_AUTO;
 
+// ISR sets true if photoelectric fork x went low
+bool damper_endstop_reached_[NUM_DAMPER];
 
 ////// HELPER FUNCTIONS //////
 
@@ -75,8 +78,7 @@ void initPCInterrupt(void)
 
 void initPINs()
 {
-  //PJON pin
-  //TODO
+  //PJON pin is intialized by pjon_init
   //endstop inputs
   PINMODE_INPUT(REG_ENDSTOP_0,PIN_ENDSTOP_0);
   PINMODE_INPUT(REG_ENDSTOP_1,PIN_ENDSTOP_1);
@@ -99,8 +101,10 @@ void initPINs()
 
 void initGuessPositionFromEndstop()
 {
+  _delay_ms(50); // give Endstop Pins time to settle
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
+    damper_endstop_reached_[d] = false;
     if (ENDSTOP_ISHIGH(d))
     {
       //if not at endstop on boot, assume we are open
@@ -133,9 +137,6 @@ bool have_dampers_reached_target()
   }
   return rv;
 }
-
-// ISR sets true if photoelectric fork x went low
-bool damper_endstop_reached_[NUM_DAMPER];
 
 //return yes if the endstop of damperX was toggled since last time we asked
 bool did_damper_pass_endstop(uint8_t damperid)
