@@ -39,7 +39,8 @@
 //         otherwise, time units since we enabled the motor
 //               100 should be open
 //               if we go over 110 without the photoelectric fork sensor signaling us, we raise an error
-uint8_t damper_states_[NUM_DAMPER] = {0,0,0};
+//   we start at 1 in order to seek the 0 position at startup via the endstop
+uint8_t damper_states_[NUM_DAMPER] = {1,1,1};
 
 //damper target states: the state that damper states is supposed to reach
 uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
@@ -99,6 +100,8 @@ void initPINs()
   FAN_STOP;
 }
 
+/*
+//Bad Idea
 void initGuessPositionFromEndstop()
 {
   _delay_ms(50); // give Endstop Pins time to settle
@@ -115,7 +118,7 @@ void initGuessPositionFromEndstop()
       damper_target_states_[d] = 0;      
     }
   }    
-}
+}*/
 
 //note: not installed dampers are always closed
 bool are_all_dampers_closed()
@@ -391,7 +394,7 @@ int main()
   loadSettingsFromEEPROM();
   pjon_init(); //PJON first since it calls arduino init which might do who knows what
   initPINs();
-  initGuessPositionFromEndstop();
+  // initGuessPositionFromEndstop(); //does not work well, since we never really stop exactly at the endstop
   initSysClkTimer3();
   initPCInterrupt();
   sei();
