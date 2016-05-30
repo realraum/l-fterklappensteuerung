@@ -159,6 +159,7 @@ void pjon_init();
 void pjon_change_busid(uint8_t id);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure);
+void pjon_senderror_dampertimeout(uint8_t damperid);
 
 void pressure_sensors_init();
 void task_check_pressure();

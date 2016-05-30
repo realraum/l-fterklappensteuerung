@@ -60,6 +60,14 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
   }
 }
 
+void pjon_printf_msg(uint8_t id, uint8_t *payload, uint8_t length)
+{
+  printf("<%02x%02x", id, length);
+  for(uint16_t i = 0; i < length; ++i)
+    printf("%02x",payload[i]);
+  printf("\r\n");
+}
+
 void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 {
   printf("got message(%d bytes) from %d: '", length, id);
@@ -68,14 +76,14 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
     printf("\r\n");
     return;
   }  
-  for(uint16_t i = 0; i < length; ++i)
-    printf("%02x ",payload[i]);
-  printf("'\r\n");
 
   pjon_message_t *msg = (pjon_message_t *) payload;
 
   if (!pjon_assert_length(length, pjon_type_to_msg_length(msg->type)))
   { return; }
+
+  pjon_printf_msg(id, payload, length);
+
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
@@ -111,6 +119,18 @@ void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure)
   msg.type = MSG_PRESSUREINFO;
   msg.pressureinfo.sensorid = sensorid;
   msg.pressureinfo.mBar = pressure;
+  pjon_printf_msg(pjon_sensor_destination_id_, (uint8_t*) &msg, pjon_type_to_msg_length(msg.type));
+  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
+}
+
+//sent if damper_states overflows before reaching endstop. May indicate defect endstop!!
+void pjon_senderror_dampertimeout(uint8_t damperid)
+{
+  pjon_message_t msg;
+  msg.type = MSG_ERROR;
+  msg.errorinfo.damperid = damperid;
+  msg.errorinfo.errortype = DAMPER_CONTROL_TIMEOUT;
+  pjon_printf_msg(pjon_sensor_destination_id_, (uint8_t*) &msg, pjon_type_to_msg_length(msg.type));
   pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 

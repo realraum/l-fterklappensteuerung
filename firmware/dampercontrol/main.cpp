@@ -43,6 +43,8 @@ uint8_t damper_states_[NUM_DAMPER] = {0,0,0};
 //damper target states: the state that damper states is supposed to reach
 uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
 
+bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
+
 bool fan_state_ = false;
 uint8_t fan_target_state_ = FAN_AUTO;
 
@@ -204,6 +206,11 @@ void task_control_dampers()
     if (did_damper_pass_endstop(d))
       damper_states_[d] = 0;
 
+    //send warning, since we timed out and that might mean the endstop does not work
+    //(0x80 << sizeof(damper_states_[0]))-1 is the max-value of uint8_t aka 0xFF
+    if (damper_target_states_[d] == 0 && damper_states_[d] == (0x80 << sizeof(damper_states_[0]))-1)
+      damper_state_overflowed_[d] = true;
+
     if (damper_states_[d] != damper_target_states_[d])
     {
       //move motor
@@ -257,6 +264,19 @@ void task_control_fan()
     break;
   }
 }
+
+void task_check_damper_state_overflow()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (damper_state_overflowed_[d])
+    {
+      damper_state_overflowed_[d] = false;
+      pjon_senderror_dampertimeout(d);
+    }
+  }
+}
+
 
 void handle_damper_cmd(dampercmd_t *rxmsg)
 {
@@ -394,6 +414,7 @@ int main()
     //task_control_dampers(); // called by timer in precise intervals, do not call from loop
     //task_simulate_pinchange_interrupt();
     task_control_fan();
+    task_check_damper_state_overflow();
   }
 }
 
