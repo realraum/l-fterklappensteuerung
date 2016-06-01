@@ -12,7 +12,10 @@ hängt im Phasenleiter.
 Datasheet: http://www.ndu.cl/pdf/0509040FT.pdf
 Schaltleistung: 40A mit eingebautem Snubber. bei induktiven Lasten: 40% Strom der 40A sind ok --> passt für unseren Motor uns seiner Startlastspitzen.
 
-SSR zieht 40mA -> schaltung für einen Transistor oder FET
+SSR zieht laut Datenblatt maximal 40mA
+laut Tests: <13mA bei 5V und <6mA bei 3V (und <11mA bei 5V mit 100 Ohm Widerstand in Serie weil weniger Spannung am SSR anliegt was auf den Stromverbrauch rückwirkt)
+-> müsste mit teensy2 pin als Senke fast ohne Transistorschalter direkt zu schalten möglich sein.
+  da atmega32u4 laut datenblatt 20mA permanent per IO senken kann solange die Summe einer im Datenblatt definierten Gruppe von Ports nicht 100mA überschreitet.
 
 Zusätzlich: Varistor für 230V parallel zum SSR:
 --> S7K275 welche im r3 sind

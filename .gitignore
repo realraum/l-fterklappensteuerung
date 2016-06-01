@@ -1,0 +1,11 @@
+firmware/contrib/avr-utils
+firmware/contrib/.spreadavr.prepared
+firmware/dampercontrol/*.a
+firmware/dampercontrol/*.d
+firmware/dampercontrol/*.o
+firmware/dampercontrol/*.d.*
+firmware/dampercontrol/*.hex
+firmware/dampercontrol/*.elf
+*.bak
+*.fcstd1
+*.sublime-workspace
