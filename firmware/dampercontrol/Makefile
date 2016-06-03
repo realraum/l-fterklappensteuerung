@@ -28,7 +28,7 @@ CXX_LIBS := arduino-stub
 EXTERNAL_LIBS := lufa pjon
 SPREADAVR_PATH := ../contrib/avr-utils
 
-PJON_PATH := $(SPREADAVR_PATH)/contrib/PJON
+PJON_PATH := $(SPREADAVR_PATH)/contrib/PJON-3.0
 PJON_OPTS :=
 
 LUFA_PATH := $(SPREADAVR_PATH)/contrib/lufa-LUFA-151115
