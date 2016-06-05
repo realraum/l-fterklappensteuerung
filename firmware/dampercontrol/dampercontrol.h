@@ -45,9 +45,9 @@
 #define PIN_FAN PD7
 #define REG_FAN PIND
 
-//aka PD3 INT3
+//aka PD6
 // see ../contrib/avr-utils/lib/arduino-leonardo/arduino_pins.h
-#define PIN_PJON 1
+#define PIN_PJON 12
 
 #define PINREG(x) x
 #define DDRREG(x) *(&x+1)
