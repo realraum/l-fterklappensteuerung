@@ -858,7 +858,7 @@ U 1 1 575411B2
 P 6950 1050
 F 0 "P103" H 7027 1091 50  0000 L CNN
 F 1 "PressureSensor3" H 7027 1000 50  0000 L CNN
-F 2 "Pin_Headers:Pin_Header_Angled_1x06" H 6950 1050 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 6950 1050 50  0001 C CNN
 F 3 "" H 6950 1050 50  0000 C CNN
 	1    6950 1050
 	1    0    0    -1  
@@ -895,7 +895,7 @@ U 1 1 57541E55
 P 7500 1450
 F 0 "P105" H 7577 1491 50  0000 L CNN
 F 1 "PressureSensor2" H 7577 1400 50  0000 L CNN
-F 2 "Pin_Headers:Pin_Header_Angled_1x06" H 7500 1450 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 7500 1450 50  0001 C CNN
 F 3 "" H 7500 1450 50  0000 C CNN
 	1    7500 1450
 	1    0    0    -1  
@@ -906,7 +906,7 @@ U 1 1 57541EFB
 P 6950 2050
 F 0 "P104" H 7027 2091 50  0000 L CNN
 F 1 "PressureSensor1" H 7027 2000 50  0000 L CNN
-F 2 "Pin_Headers:Pin_Header_Angled_1x06" H 6950 2050 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 6950 2050 50  0001 C CNN
 F 3 "" H 6950 2050 50  0000 C CNN
 	1    6950 2050
 	1    0    0    -1  
