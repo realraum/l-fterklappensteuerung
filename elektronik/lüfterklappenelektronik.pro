@@ -1,4 +1,4 @@
-update=Son 22 Mai 2016 13:32:25 CEST
+update=Son 05 Jun 2016 03:40:15 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=/home/bernhard/source/arduino_micro_shield
+LibDir=../../kicad-libs
 [eeschema/libraries]
 LibName1=power
 LibName2=device

@@ -2,45 +2,47 @@
 #define DAMPER_CONTROL_H
 
 
-/* Hardware: AVR ATMEGA32U4
+/* Hardware: AVR ATMEGA32U4 (Arduino Pro Micro)
  * 
  * ==== PINS ====
- * PB0... SPI Sensor0 CS
+ * PD0... SPI Sensor1 CS
+ * PD1... SPI Sensor0 CS
+ * PD4... SPI Sensor2 CS
+ * PD2... RX
+ * PD3....TX
  * PB1... SPI CLK
  * PB2... SPI MOSI
  * PB3... SPI MISO
  * PB4 .. Endstop 0  (PCINT4)
  * PB5 .. Endstop 1  (PCINT5)
  * PB6 .. Endstop 2  (PCINT6)
- * PB7... SPI Sensor1 CS
- * PC6... SPI Sensor2 CS
- * PD0... Damper Motor 0
- * PD1... Damper Motor 1
- * PD2... Damper Motor 2
- * PD3... PJON Pin
- * PD6... Ventilation Fan (Teensy2LED)
- * PF0... =ADC0 needed by PJON
+ * PF4... Damper Motor 0
+ * PF5... Damper Motor 1
+ * PF6... Damper Motor 2
+ * PD6... PJON Pin
+ * PD7... Ventilation Fan (Teensy2LED)
+ * PF0/PF7... =ADC0 needed by PJON
 */
 
-#define PIN_CS_S0 PB0
-#define REG_CS_S0 PINB
-#define PIN_CS_S1 PB7
-#define REG_CS_S1 PINB
-#define PIN_CS_S2 PC6
-#define REG_CS_S2 PINC
+#define PIN_CS_S0 PD1
+#define REG_CS_S0 PIND
+#define PIN_CS_S1 PD0
+#define REG_CS_S1 PIND
+#define PIN_CS_S2 PD4
+#define REG_CS_S2 PIND
 #define PIN_ENDSTOP_0 PB4
 #define REG_ENDSTOP_0 PINB
 #define PIN_ENDSTOP_1 PB5
 #define REG_ENDSTOP_1 PINB
 #define PIN_ENDSTOP_2 PB6
 #define REG_ENDSTOP_2 PINB
-#define PIN_DAMPER_0 PD0
-#define REG_DAMPER_0 PIND
-#define PIN_DAMPER_1 PD1
-#define REG_DAMPER_1 PIND
-#define PIN_DAMPER_2 PD2
-#define REG_DAMPER_2 PIND
-#define PIN_FAN PD6
+#define PIN_DAMPER_0 PF4
+#define REG_DAMPER_0 PINF
+#define PIN_DAMPER_1 PD5
+#define REG_DAMPER_1 PINF
+#define PIN_DAMPER_2 PD6
+#define REG_DAMPER_2 PINF
+#define PIN_FAN PD7
 #define REG_FAN PIND
 
 //aka PD3 INT3
@@ -86,9 +88,9 @@
 #define FAN_STOP PIN_SW(PORTD,PD6,OP_CLEARBIT)
 #define FAN_ISRUNNING (PIN_SW(PIND,PD6,OP_CHECK))
 
-#define CS_SENSOR_0(LOWHIGH) (PIN_SW(PORTB,PB0,LOWHIGH))
-#define CS_SENSOR_1(LOWHIGH) (PIN_SW(PORTB,PB7,LOWHIGH))
-#define CS_SENSOR_2(LOWHIGH) (PIN_SW(PORTC,PC6,LOWHIGH))
+#define CS_SENSOR_0(LOWHIGH) (PIN_SW(REG_CS_S0,PIN_CS_S0,LOWHIGH))
+#define CS_SENSOR_1(LOWHIGH) (PIN_SW(REG_CS_S1,PIN_CS_S1,LOWHIGH))
+#define CS_SENSOR_2(LOWHIGH) (PIN_SW(REG_CS_S2,PIN_CS_S2,LOWHIGH))
 #define CS_SENSOR(x,LOWHIGH) CS_SENSOR_#x(LOWHIGH)
 
 
