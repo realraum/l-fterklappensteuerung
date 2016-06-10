@@ -3,6 +3,8 @@
 
 
 /* Hardware: AVR ATMEGA32U4 (Arduino Pro Micro)
+ * PinOut: https://deskthority.net/wiki/Arduino_Pro_Micro
+ *
  * 
  * ==== PINS ====
  * PD0... SPI Sensor1 CS
@@ -19,7 +21,7 @@
  * PF4... Damper Motor 0
  * PF5... Damper Motor 1
  * PF6... Damper Motor 2
- * PD6... PJON Pin
+ * PC6... PJON Pin
  * PD7... Ventilation Fan (Teensy2LED)
  * PF0/PF7... =ADC0 needed by PJON
 */
@@ -45,9 +47,9 @@
 #define PIN_FAN PD7
 #define REG_FAN PIND
 
-//aka PD6
-// see ../contrib/avr-utils/lib/arduino-leonardo/arduino_pins.h
-#define PIN_PJON 12
+//aka PC6
+// see ../contrib/avr-utils/lib/arduino-leonardo/pins_arduino.h
+#define PIN_PJON 5
 
 #define PINREG(x) x
 #define DDRREG(x) *(&x+1)

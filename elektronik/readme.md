@@ -1,8 +1,10 @@
 ===== µC =====
 
-ATMega32U4
-5V
-16MHz
+ATMega32U4 / 5V / 16MHz
+
+Arduino Pro Micro Clone
+
+[see used Pinout here](arduino_pro_micro_pinout.html)
 
 
 ===== 230VAC Lüfter =====
@@ -43,7 +45,7 @@ SBL10L25 od. Ähnliches
 
 ===== Gabellichtschranken =====
 
-2k2 Ohm(?) an K Ausgang um Widerstand der Photodiode zu balancieren.
+2k2 Ohm an K Ausgang um Widerstand der Photodiode zu balancieren.
 
 120 Ohm Vorwiderstand für die LED
 
