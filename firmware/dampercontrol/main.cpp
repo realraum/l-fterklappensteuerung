@@ -325,6 +325,10 @@ void printSettings()
     printf("\t pos: consid. open at: %d, current: %d, target: %d\r\n", damper_open_pos_[d],damper_states_[d],damper_target_states_[d]);
     printf("\t endstop lightbeam: %s\r\n", (ENDSTOP_ISHIGH(d))?"interrupted":"uninterrupted");
     printf("Pressure Sensor%d: %s installed\r\n", d, (sensor_installed_[d])?"is":"NOT");
+    if (sensor_installed_[d])
+    {
+      printf("\t Pressure: %.2f Pa @ %.2f degC\r\n", get_latest_pressure(d), get_latest_temperature(d));
+    }
   }
   printf("Fan is %s and set to %d\r\n", (fan_state_)?"on":"off", fan_target_state_);
 }
@@ -400,6 +404,7 @@ int main()
   sei();
   pressure_sensors_init();
 
+  uint8_t loop_count = 0;
 
   // loop
   for (;;)
@@ -414,12 +419,14 @@ int main()
     }
 
     usbio_task();
-    task_check_pressure();
+    if (loop_count == 0)
+      task_check_pressure();
     task_pjon();
     //task_control_dampers(); // called by timer in precise intervals, do not call from loop
     //task_simulate_pinchange_interrupt();
     task_control_fan();
     task_check_damper_state_overflow();
+    loop_count++;
   }
 }
 

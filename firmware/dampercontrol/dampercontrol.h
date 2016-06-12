@@ -90,10 +90,10 @@
 #define FAN_STOP PIN_SW(PORTD,PD6,OP_CLEARBIT)
 #define FAN_ISRUNNING (PIN_SW(PIND,PD6,OP_CHECK))
 
-#define CS_SENSOR_0(LOWHIGH) (PIN_SW(REG_CS_S0,PIN_CS_S0,LOWHIGH))
-#define CS_SENSOR_1(LOWHIGH) (PIN_SW(REG_CS_S1,PIN_CS_S1,LOWHIGH))
-#define CS_SENSOR_2(LOWHIGH) (PIN_SW(REG_CS_S2,PIN_CS_S2,LOWHIGH))
-#define CS_SENSOR(x,LOWHIGH) CS_SENSOR_#x(LOWHIGH)
+#define CS_SENSOR_0(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S0),PIN_CS_S0,LOWHIGH))
+#define CS_SENSOR_1(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S1),PIN_CS_S1,LOWHIGH))
+#define CS_SENSOR_2(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S2),PIN_CS_S2,LOWHIGH))
+#define CS_SENSOR(x,LOWHIGH) CS_SENSOR_##x(LOWHIGH)
 
 
 /// GLOBALS ///
@@ -115,7 +115,8 @@ typedef struct {
 
 typedef  struct {
   uint8_t sensorid;
-  double mBar;
+  float celsius;
+  float pascal;
 } pressureinfo_t;
 
 typedef  struct {
@@ -161,11 +162,12 @@ void updateInstalledDampersFromChar(uint8_t damper_installed);
 void pjon_init();
 void pjon_change_busid(uint8_t id);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
-void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure);
+void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure);
 void pjon_senderror_dampertimeout(uint8_t damperid);
 
 void pressure_sensors_init();
 void task_check_pressure();
-
+float get_latest_pressure(uint8_t sensorid);
+float get_latest_temperature(uint8_t sensorid);
 
 #endif

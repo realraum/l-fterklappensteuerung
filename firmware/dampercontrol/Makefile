@@ -21,9 +21,9 @@
 ##
 
 NAME := dampercontrol
-BOARD_TYPE := teensy2
+BOARD_TYPE := arduinoProMicro
 CXX_OBJ := main.o settings.o comm.o pressure.o
-LIBS := util led lufa-descriptor-usbserial usbio
+LIBS := util led lufa-descriptor-usbserial usbio bmp280
 CXX_LIBS := arduino-stub
 EXTERNAL_LIBS := lufa pjon
 SPREADAVR_PATH := ../contrib/avr-utils
@@ -47,6 +47,11 @@ LUFA_OPTS += -D USB_PRODUCT="L\"dampercontrol\""
 LUFA_COMPONENTS := USB USBCLASS ADC
 
 include $(SPREADAVR_PATH)/include.mk
+## PJON likes c++11
+CXXFLAGS += -std=c++11 -I$(LUFA_PATH)
 
-RESET_FUNC := $(SPREADAVR_PATH)/tools/reset_lufa_cdc
-RESET_PARAM := '!'
+## uncomment to printf floats
+LDFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
+AVRDUDE_PORT := $(shell $(SPREADAVR_PATH)/tools/detect_newest_acm)
+#AVRDUDE_PORT := $(shell $(SPREADAVR_PATH)/tools/detect_lufa_cdc 1)
+RESET_FUNC := $(SPREADAVR_PATH)/tools/reset_sparkfun

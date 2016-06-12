@@ -113,12 +113,13 @@ void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
   pjonbus_.send(BROADCAST, (const char*) payload, length);
 }
 
-void pjon_send_pressure_infomsg(uint8_t sensorid, double pressure)
+void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure)
 {
   pjon_message_t msg;
   msg.type = MSG_PRESSUREINFO;
   msg.pressureinfo.sensorid = sensorid;
-  msg.pressureinfo.mBar = pressure;
+  msg.pressureinfo.celsius = temperature;
+  msg.pressureinfo.pascal = pressure;
   pjon_printf_msg(pjon_sensor_destination_id_, (uint8_t*) &msg, pjon_type_to_msg_length(msg.type));
   pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
