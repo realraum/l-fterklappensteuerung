@@ -404,23 +404,35 @@ int main()
   sei();
   pressure_sensors_init();
 
-  uint8_t loop_count = 0;
+  uint16_t loop_count = 0;
 
   // loop
   for (;;)
   {
     int16_t BytesReceived = usbio_bytes_received();
-    while(BytesReceived > 0) {
+    while(BytesReceived > 0)
+    {
       int ReceivedByte = fgetc(stdin);
-      if(ReceivedByte != EOF) {
+      if(ReceivedByte != EOF)
+      {
         handle_serialdata(ReceivedByte);
       }
       BytesReceived--;
     }
 
     usbio_task();
-    if (loop_count == 0)
+    if ((loop_count & 0xFFF) == 0)
       task_check_pressure();
+    if ((loop_count & 0xFFFF) == 0)
+    {
+      for (uint8_t d=0; d<NUM_DAMPER; d++)
+      {
+        if (sensor_installed_[d])
+        {
+          pjon_send_pressure_infomsg(d, get_latest_pressure(d), get_latest_temperature(d));
+        }
+      }
+    }
     task_pjon();
     //task_control_dampers(); // called by timer in precise intervals, do not call from loop
     //task_simulate_pinchange_interrupt();

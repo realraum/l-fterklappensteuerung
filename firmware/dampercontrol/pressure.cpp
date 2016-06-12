@@ -49,7 +49,6 @@ void task_check_pressure()
       continue;
 
     cur_temp_pressure[d] = bmp280_readTempAndPressure(&psensor[d]);
-    pjon_send_pressure_infomsg(d, cur_temp_pressure[d].temperature, cur_temp_pressure[d].pressure);
   }
 }
 

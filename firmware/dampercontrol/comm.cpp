@@ -113,7 +113,7 @@ void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
   pjonbus_.send(BROADCAST, (const char*) payload, length);
 }
 
-void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure)
+void pjon_send_pressure_infomsg(uint8_t sensorid, float pressure, float temperature)
 {
   pjon_message_t msg;
   msg.type = MSG_PRESSUREINFO;
