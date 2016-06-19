@@ -25,7 +25,7 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 uint8_t damper_open_pos_[NUM_DAMPER] = {103,103,103};
 
 uint8_t pjon_bus_id_ = 9; //default ID
-uint8_t pjon_sensor_destination_id_ = 0;
+uint8_t pjon_sensor_destination_id_ = 0; //BROADCAST
 
 
 void saveSettings2EEPROM()
