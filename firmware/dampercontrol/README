@@ -29,3 +29,14 @@ echo -ne ">\x05\x00\x02\x01\x01\02" >| /dev/ttyACM3
 ## Set damper-open-position to 128 for all 3 dampers:
 
 echo -ne ">\x04\x03\x80\x80\x80" >| /dev/ttyACM3
+
+
+===== TODO =====
+
+- handle pjon_send return values (BUSY, ACK, NACK, FAIL) .. try again.. ?
+- maybe better handle pjon_error_handler
+- right now fan does not activate if non-enabled dampers on fan-µc are opened and fan-µc dampers are closed ---> maybe broadcast success or leverage ACK packets?
+  really want to avoid remembering and syncing state of other µCs
+- instead of broadcast.. maybe chain messages.. first send to id0, id0 sends to id1 while appending which dampers it has enabled, and so on until all µc with all dampers enabled have been reached..
+  if we know we only have 2 µc the ack from id1 to id2 would already be sufficient, otherwise last sends broadcast of final state... and then fan opens
+- use ttyACM0 (exclusively for pjon) and ttyACM1 (for debugging)
