@@ -44,12 +44,12 @@
 #define REG_DAMPER_1 PINF
 #define PIN_DAMPER_2 PD6
 #define REG_DAMPER_2 PINF
-#define PIN_FAN PD7
-#define REG_FAN PIND
+#define PIN_FAN PE6
+#define REG_FAN PINE
 
-//aka PC6
+//aka PD7
 // see ../contrib/avr-utils/lib/arduino-leonardo/pins_arduino.h
-#define PIN_PJON 5
+#define PIN_PJON 6
 
 #define PINREG(x) x
 #define DDRREG(x) *(&x+1)
