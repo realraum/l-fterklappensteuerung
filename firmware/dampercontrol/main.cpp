@@ -47,7 +47,6 @@ uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
 
 bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
 
-bool fan_state_ = false;
 uint8_t fan_target_state_ = FAN_AUTO;
 
 // ISR sets true if photoelectric fork x went low
@@ -93,10 +92,10 @@ void initPINs()
   PINMODE_OUTPUT(REG_DAMPER_2,PIN_DAMPER_1);
   PINMODE_OUTPUT(REG_DAMPER_2,PIN_DAMPER_2);
   //PD3 is pjon, maybe it can use the INT4 someday
-  PINMODE_OUTPUT(REG_FAN,PIN_FAN); //FAN
   DAMPER_MOTOR_STOP(0);
   DAMPER_MOTOR_STOP(1);
   DAMPER_MOTOR_STOP(2);
+  PINMODE_OUTPUT(REG_FAN,PIN_FAN); //FAN
   FAN_STOP;
 }
 
@@ -330,7 +329,7 @@ void printSettings()
       printf("\t Pressure: %.2f Pa @ %.2f degC\r\n", get_latest_pressure(d), get_latest_temperature(d));
     }
   }
-  printf("Fan is %s and set to %d\r\n", (fan_state_)?"on":"off", fan_target_state_);
+  printf("Fan is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fan_target_state_);
 }
 
 void handle_serialdata(char c)
