@@ -39,4 +39,5 @@ echo -ne ">\x04\x03\x80\x80\x80" >| /dev/ttyACM3
   really want to avoid remembering and syncing state of other µCs
 - instead of broadcast.. maybe chain messages.. first send to id0, id0 sends to id1 while appending which dampers it has enabled, and so on until all µc with all dampers enabled have been reached..
   if we know we only have 2 µc the ack from id1 to id2 would already be sufficient, otherwise last sends broadcast of final state... and then fan opens
+- note: lost packet has already happened in test
 - use ttyACM0 (exclusively for pjon) and ttyACM1 (for debugging)
