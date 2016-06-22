@@ -23,7 +23,7 @@
 NAME := dampercontrol
 BOARD_TYPE := arduinoProMicro
 CXX_OBJ := main.o settings.o comm.o pressure.o
-LIBS := util led lufa-descriptor-usbserial usbio bmp280
+LIBS := util led lufa-descriptor-usbserial dualusbio bmp280
 CXX_LIBS := arduino-stub
 EXTERNAL_LIBS := lufa pjon
 SPREADAVR_PATH := ../contrib/avr-utils

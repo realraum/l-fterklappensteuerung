@@ -30,7 +30,7 @@
 
 #include "util.h"
 #include "led.h"
-#include "usbio.h"
+#include "dualusbio.h"
 
 #include "dampercontrol.h"
 
@@ -280,8 +280,6 @@ void task_check_damper_state_overflow()
   }
 }
 
-enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTLEN, CPKT};
-
 void handle_damper_cmd(dampercmd_t *rxmsg)
 {
   switch (rxmsg->fan)
@@ -332,12 +330,46 @@ void printSettings()
   printf("Fan is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fan_target_state_);
 }
 
+enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTDST, CPKTLEN, CPKTDATA};
+
+void handle_serial2pjon(char c)
+{
+  static next_char_state_t next_char = CPKTDST;
+  static uint8_t read_num_chars = 0;
+  static uint8_t msg_dst = 0;
+  static uint8_t msg_len = 0;
+  static uint8_t msg_buf[0xff];
+
+  switch (next_char) {
+    default:
+    case CPKTDST:
+      msg_dst = c;
+      next_char = CPKTLEN;
+    break;
+    case CPKTLEN:
+      if (c == 0) {
+        next_char = CPKTDST;
+        break;
+      }
+      read_num_chars = c;
+      msg_len = 0;
+      next_char = CPKTDATA;
+      break;
+    case CPKTDATA:
+      msg_buf[msg_len++] = c;
+      read_num_chars--;
+      if (read_num_chars == 0)
+      {
+        pjon_inject_msg(msg_dst, msg_len, msg_buf);
+        next_char = CPKTDST;
+      }
+      break;
+  }
+}
+
 void handle_serialdata(char c)
 {
   static next_char_state_t next_char = CCMD;
-  static uint8_t read_num_chars = 0;
-  static uint8_t msg_len = 0;
-  static uint8_t msg_buf[0xff];
 
   switch (next_char) {
     default:
@@ -348,7 +380,6 @@ void handle_serialdata(char c)
         case 'o': damper_target_states_[0] = damper_open_pos_[0]; printf("opening Damper0\r\n"); break;
         case 'c': damper_target_states_[0] = 0; printf("closing Damper0\r\n"); break;
         case 'h': damper_target_states_[0] = damper_open_pos_[0]/2; printf("half-open Damper0\r\n"); break;
-        case '>': next_char = CPKTLEN; break;
         case 's': printSettings(); break;
         case '!': reset2bootloader(); break;
       }
@@ -363,24 +394,6 @@ void handle_serialdata(char c)
       printf("installed dampers updated\r\n");
       next_char = CCMD;
     break;
-    case CPKTLEN:
-      if (c == 0) {
-        next_char = CCMD;
-        break;
-      }
-      read_num_chars = c;
-      msg_len = 0;
-      next_char = CPKT;
-      break;
-    case CPKT:
-      msg_buf[msg_len++] = c;
-      read_num_chars--;
-      if (read_num_chars == 0)
-      {
-        pjon_inject_broadcast_msg(msg_len, msg_buf);
-        next_char = CCMD;
-      }
-      break;
   }
 }
 
@@ -391,7 +404,8 @@ int main()
 
   cpu_init();
   led_init();
-  usbio_init();
+  dualusbio_init();
+  dualusbio_make_stdio(1);
 
   // init
   loadSettingsFromEEPROM();
@@ -408,7 +422,7 @@ int main()
   // loop
   for (;;)
   {
-    int16_t BytesReceived = usbio_bytes_received();
+    int16_t BytesReceived = dualusbio_bytes_received_std();
     while(BytesReceived > 0)
     {
       int ReceivedByte = fgetc(stdin);
@@ -418,8 +432,18 @@ int main()
       }
       BytesReceived--;
     }
+    BytesReceived = dualusbio_bytes_received(0);
+    while(BytesReceived > 0)
+    {
+      int ReceivedByte = fgetc(stdin);
+      if(ReceivedByte != EOF)
+      {
+        handle_serial2pjon(ReceivedByte);
+      }
+      BytesReceived--;
+    }
 
-    usbio_task();
+    dualusbio_task();
     if ((loop_count & 0xFFF) == 0)
       task_check_pressure();
     if ((loop_count & 0xFFFF) == 0)

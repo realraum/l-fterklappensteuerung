@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "usbio.h"
+#include "dualusbio.h"
 #include "Arduino.h"
 #include "PJON.h"
 #include "dampercontrol.h"
@@ -63,8 +63,13 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
 void pjon_printf_msg(uint8_t id, uint8_t *payload, uint8_t length)
 {
   printf("<%02x%02x", id, length);
+  fputc(id, 0);
+  fputc(length, 0);
   for(uint16_t i = 0; i < length; ++i)
-    printf("%02x",payload[i]);
+  {
+      fputc(payload[i], 0);
+      printf("%02x",payload[i]);
+  }
   printf("\r\n");
 }
 
@@ -106,11 +111,17 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
   }
 }
 
-void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
+void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
 {
   pjon_recv_handler(pjon_bus_id_, payload, length);
   //hope we did not mangle the payload
   pjonbus_.send(BROADCAST, (const char*) payload, length);
+}
+
+
+void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
+{
+  pjon_inject_msg(BROADCAST, length, payload);
 }
 
 void pjon_send_pressure_infomsg(uint8_t sensorid, float pressure, float temperature)

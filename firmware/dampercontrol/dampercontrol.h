@@ -161,6 +161,7 @@ void updateSettingsFromPacket(updatesettings_t *s);
 void updateInstalledDampersFromChar(uint8_t damper_installed);
 void pjon_init();
 void pjon_change_busid(uint8_t id);
+void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure);
 void pjon_senderror_dampertimeout(uint8_t damperid);
