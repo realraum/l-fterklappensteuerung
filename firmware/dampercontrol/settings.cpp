@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "dampercontrol.h"
 
-#define EEPROM_DATA_VERSION 0
+#define EEPROM_DATA_VERSION 1
 
 
 //read this from eeprom on start
@@ -24,7 +24,7 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 // Otherwise the damper_state_ position might overflow and reach 0 before we are at the endstop.
 uint8_t damper_open_pos_[NUM_DAMPER] = {103,103,103};
 
-uint8_t pjon_bus_id_ = 9; //default ID
+uint8_t pjon_bus_id_ = 255; //not assigned
 uint8_t pjon_sensor_destination_id_ = 0; //BROADCAST
 
 

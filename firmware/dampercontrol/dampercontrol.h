@@ -102,7 +102,7 @@
 
 #define NUM_DAMPER 3
 
-enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS};
+enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS, MSG_PJONID_DOAUTO, MSG_PJONID_INFO, MSG_PJONID_SET};
 enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN};
 enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO};
 enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
@@ -113,20 +113,24 @@ typedef struct {
   uint8_t fan : 2;
 } dampercmd_t;
 
-typedef  struct {
+typedef struct {
   uint8_t sensorid;
   float celsius;
   float pascal;
 } pressureinfo_t;
 
-typedef  struct {
+typedef struct {
   uint8_t damperid;
   uint8_t errortype;
 } errorinfo_t;
 
-typedef  struct {
+typedef struct {
   uint8_t damper_open_pos[NUM_DAMPER];
 } updatesettings_t;
+
+typedef struct {
+  uint8_t pjon_id;
+} pjonidsetting_t;
 
 
 typedef struct {
@@ -136,6 +140,7 @@ typedef struct {
     pressureinfo_t pressureinfo;
     errorinfo_t errorinfo;
     updatesettings_t updatesettings;
+    pjonidsetting_t pjonidsetting;
   };
 } pjon_message_t;
 

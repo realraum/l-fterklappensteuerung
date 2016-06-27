@@ -54,6 +54,11 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
     case MSG_UPDATESETTINGS:
       return sizeof(updatesettings_t)+1;
       break;
+    case MSG_PJONID_DOAUTO:
+      return 1;
+    case MSG_PJONID_INFO:
+    case MSG_PJONID_SET:
+      return sizeof(pjonidsetting_t)+1;
     default:
       return 0;
       break;
@@ -105,19 +110,65 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
       printf("got MSG_UPDATESETTINGS\r\n");
       updateSettingsFromPacket(&(msg->updatesettings));
       break;
+    case MSG_PJONID_DOAUTO:
+      pjon_startautoiddiscover();
+      break;
+    case MSG_PJONID_INFO:
+      //reply to id with our pjon_id
+      pjon_identify_myself(id);
+      break;
+    case MSG_PJONID_SET:
+      pjon_change_busid(msg->pjonidsetting.pjon_id);
+      break;
     default:
       printf("Unknown MSG type %d\n", msg->type);
       break;
   }
 }
 
-void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
+void pjon_identify_myself(uint8_t toid)
 {
-  pjon_recv_handler(pjon_bus_id_, payload, length);
-  //hope we did not mangle the payload
-  pjonbus_.send(BROADCAST, (const char*) payload, length);
+  pjon_message_t msg;
+  msg.type = MSG_PJONID_INFO;
+  msg.pjonidsetting.pjon_id = pjonbus.device_id();
+  pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
+void pjon_startautoiddiscover()
+{
+  _delay_ms(200); // let the bus settle after receiving the broadcast
+  pjonbus.acquire_id();
+  if (pjonbus.device_id() == NOT_ASSIGNED)
+  {
+    _delay_ms(100);
+    pjonbus.acquire_id();
+  }
+}
+
+void pjon_become_master_of_ids()
+{
+  pjon_message_t msg;
+  msg.type = MSG_PJONID_DOAUTO;
+  //become #1
+  pjon_change_busid(1);
+  //tell everybody else to get an autoid
+  pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  //discover id's of everybody else:
+  // wait till all µC replied
+  // sort id's numerically
+  // for ids
+  // first id with gap of >0 to previous id .. tell it to decrease id by gapsize
+  // continue until all id's linear 0,1,2,3,4 without gap
+}
+
+void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
+{
+  if (dst == 0 || pjonbus_.device_id() == dst)
+    pjon_recv_handler(pjon_bus_id_, payload, length);
+  //hope we did not mangle the payload in recv_handler
+  if (dst == 0 || pjonbus_.device_id() != dst)
+    pjonbus_.send(dst, (const char*) payload, length);
+}
 
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
 {
@@ -159,8 +210,18 @@ void pjon_init()
   pjonbus_.set_error(pjon_error_handler);
   pjonbus_.set_receiver(pjon_recv_handler);
   pjonbus_.set_pin(PIN_PJON);
-  pjonbus_.set_id(pjon_bus_id_);
+  if (pjon_bus_id_ != NOT_ASSIGNED)
+    pjonbus_.set_id(pjon_bus_id_);
   pjonbus_.begin();
+  if (pjon_bus_id_ == NOT_ASSIGNED)
+  {
+    pjonbus.acquire_id();
+    if (pjonbus.device_id() != NOT_ASSIGNED)
+    {
+      pjon_bus_id_ = pjonbus.device_id();
+      saveSettings2EEPROM();
+    }
+  }
 }
 
 void task_pjon()
