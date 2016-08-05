@@ -82,3 +82,14 @@ void updateInstalledDampersFromChar(uint8_t damper_installed)
   }
   saveSettings2EEPROM();
 }
+
+uint8_t getInstalledDampersAsBitfield()
+{
+  uint8_t rv = 0;
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (damper_installed_[d])
+      rv |= _BV(d);
+  }
+  return rv;
+}

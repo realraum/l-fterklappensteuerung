@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <util/delay.h>
 #include "dualusbio.h"
 #include "Arduino.h"
 #include "PJON.h"
@@ -43,7 +44,7 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
   switch(type)
   {
     case MSG_DAMPERCMD:
-      return sizeof(dampercmd_t)+1;
+      return sizeof(dampercmd_t)+2;
       break;
     case MSG_PRESSUREINFO:
       return sizeof(pressureinfo_t)+1;
@@ -52,7 +53,7 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
       return sizeof(errorinfo_t)+1;
       break;
     case MSG_UPDATESETTINGS:
-      return sizeof(updatesettings_t)+1;
+      return sizeof(updatesettings_t)+2;
       break;
     case MSG_PJONID_DOAUTO:
       return 1;
@@ -78,6 +79,61 @@ void pjon_printf_msg(uint8_t id, uint8_t *payload, uint8_t length)
   printf("\r\n");
 }
 
+bool pjon_chaincast_didreachall(uint8_t bitfield)
+{
+  #if NUM_DAMPER != 3
+    #error "Code assumes NUM_DAMPER == 3. Rewrite as for-loop"
+  #endif
+  return ((bitfield & _BV(0)) > 0) && ((bitfield & _BV(1)) > 0) && ((bitfield & _BV(2)) > 0);
+}
+
+void pjon_chaincast_recv_handler(uint8_t fromid, pjon_message_t *msg)
+{
+  //update reach field
+  msg->chaincast.reach |= getInstalledDampersAsBitfield();
+  bool didreachall = pjon_chaincast_didreachall(msg->chaincast.reach);
+
+  switch(msg->type)
+  {
+    case MSG_DAMPERCMD:
+      printf("got msg_dampercmd\r\n");
+      handle_damper_cmd(didreachall, &(msg->chaincast.dampercmd));
+      break;
+    case MSG_UPDATESETTINGS:
+      printf("got MSG_UPDATESETTINGS\r\n");
+      updateSettingsFromPacket(&(msg->chaincast.updatesettings));
+      break;
+    default:
+      printf("Unknown MSG type %d\n", msg->type);
+      break;
+  }
+
+  pjon_chaincast_forward(fromid, didreachall, msg);
+}
+
+void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* msg)
+{
+  uint8_t next_id = 0;
+  if (fromid == 0)
+  {
+    return; // do not forward broadcasts
+  }
+
+  // if pkt has reached µcs controlling all the dampers, forward down-id
+  // else forward up-i until bitfield is full
+  if (didreachall)
+  {
+    next_id = pjonbus_.device_id() -1;
+  } else {
+    next_id = pjonbus_.device_id() +1;
+  }
+
+  if (next_id > 0)
+  {
+    pjonbus_.send(next_id, (char*) msg, pjon_type_to_msg_length(msg->type));
+  }
+}
+
 void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 {
   printf("got message(%d bytes) from %d: '", length, id);
@@ -97,18 +153,14 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
-      printf("got msg_dampercmd\r\n");
-      handle_damper_cmd(&(msg->dampercmd));
+    case MSG_UPDATESETTINGS:
+      pjon_chaincast_recv_handler(id, (pjon_message_t*) payload);
       break;
     case MSG_PRESSUREINFO:
       printf("got MSG_PRESSUREINFO\r\n");
       break;
     case MSG_ERROR:
       printf("got MSG_ERROR\r\n");
-      break;
-    case MSG_UPDATESETTINGS:
-      printf("got MSG_UPDATESETTINGS\r\n");
-      updateSettingsFromPacket(&(msg->updatesettings));
       break;
     case MSG_PJONID_DOAUTO:
       pjon_startautoiddiscover();
@@ -130,18 +182,18 @@ void pjon_identify_myself(uint8_t toid)
 {
   pjon_message_t msg;
   msg.type = MSG_PJONID_INFO;
-  msg.pjonidsetting.pjon_id = pjonbus.device_id();
+  msg.pjonidsetting.pjon_id = pjonbus_.device_id();
   pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 void pjon_startautoiddiscover()
 {
   _delay_ms(200); // let the bus settle after receiving the broadcast
-  pjonbus.acquire_id();
-  if (pjonbus.device_id() == NOT_ASSIGNED)
+  pjonbus_.acquire_id();
+  if (pjonbus_.device_id() == NOT_ASSIGNED)
   {
     _delay_ms(100);
-    pjonbus.acquire_id();
+    pjonbus_.acquire_id();
   }
 }
 
@@ -152,7 +204,7 @@ void pjon_become_master_of_ids()
   //become #1
   pjon_change_busid(1);
   //tell everybody else to get an autoid
-  pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
   //discover id's of everybody else:
   // wait till all µC replied
   // sort id's numerically
@@ -215,10 +267,10 @@ void pjon_init()
   pjonbus_.begin();
   if (pjon_bus_id_ == NOT_ASSIGNED)
   {
-    pjonbus.acquire_id();
-    if (pjonbus.device_id() != NOT_ASSIGNED)
+    pjonbus_.acquire_id();
+    if (pjonbus_.device_id() != NOT_ASSIGNED)
     {
-      pjon_bus_id_ = pjonbus.device_id();
+      pjon_bus_id_ = pjonbus_.device_id();
       saveSettings2EEPROM();
     }
   }

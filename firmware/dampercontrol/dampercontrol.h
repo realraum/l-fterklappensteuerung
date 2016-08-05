@@ -98,8 +98,6 @@
 
 /// GLOBALS ///
 
-
-
 #define NUM_DAMPER 3
 
 enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS, MSG_PJONID_DOAUTO, MSG_PJONID_INFO, MSG_PJONID_SET};
@@ -132,14 +130,20 @@ typedef struct {
   uint8_t pjon_id;
 } pjonidsetting_t;
 
+typedef struct {
+  uint8_t reach; // bitfield to indicate which hardware saw this packet: damper0, damper1, damper2, fan
+  union {
+    dampercmd_t dampercmd;
+    updatesettings_t updatesettings;
+  };
+} pjon_chaincast_t;
 
 typedef struct {
   uint8_t type;
   union {
-    dampercmd_t dampercmd;
+    pjon_chaincast_t chaincast;
     pressureinfo_t pressureinfo;
     errorinfo_t errorinfo;
-    updatesettings_t updatesettings;
     pjonidsetting_t pjonidsetting;
   };
 } pjon_message_t;
@@ -158,18 +162,23 @@ void task_control_fan(void);
 void task_check_pressure(void);
 void task_pjon(void);
 void task_usbserial(void);
-void handle_damper_cmd(dampercmd_t *rxmsg);
+void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg);
 
 void saveSettings2EEPROM();
 void loadSettingsFromEEPROM();
 void updateSettingsFromPacket(updatesettings_t *s);
 void updateInstalledDampersFromChar(uint8_t damper_installed);
+uint8_t getInstalledDampersAsBitfield();
+
 void pjon_init();
 void pjon_change_busid(uint8_t id);
 void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure);
 void pjon_senderror_dampertimeout(uint8_t damperid);
+void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* msg);
+void pjon_identify_myself(uint8_t toid);
+void pjon_startautoiddiscover();
 
 void pressure_sensors_init();
 void task_check_pressure();
