@@ -330,7 +330,7 @@ void printSettings()
     printf("Pressure Sensor%d: %s installed\r\n", d, (sensor_installed_[d])?"is":"NOT");
     if (sensor_installed_[d])
     {
-      printf("\t Pressure: %.2f Pa @ %.2f degC\r\n", get_latest_pressure(d), get_latest_temperature(d));
+      printf("\t Pressure: %.2f Pa @ %.2f degC\r\n", (double) get_latest_pressure(d), (double) get_latest_temperature(d));
     }
   }
   printf("Fan is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fan_target_state_);
