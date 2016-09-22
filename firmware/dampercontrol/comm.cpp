@@ -7,6 +7,34 @@
 
 PJON<SoftwareBitBang> pjonbus_;
 
+#define PJOIN_ID_LIST_LEN 10
+uint8_t pjon_id_list_[PJOIN_ID_LIST_LEN];
+uint8_t pjon_id_list_idx_ = 0;
+
+void pjoinidlist_clear()
+{
+  for (uint8_t c=0; c < PJOIN_ID_LIST_LEN; c++)
+    pjon_id_list_[c] = 0;
+  pjon_id_list_idx_ = 0;
+}
+
+void pjoinidlist_add(uint8_t id)
+{
+  if (pjon_id_list_idx_ < PJOIN_ID_LIST_LEN)
+    pjon_id_list_[pjon_id_list_idx_++] = id;
+}
+
+int compare_uint8(const void *v1, const void *v2)
+{
+  return (*((uint8_t*) v1) < *((uint8_t*) v2))? -1 : (*((uint8_t*) v1) > *((uint8_t*) v2))? 1 : 0;
+}
+
+void pjoinidlist_sort()
+{
+  qsort(pjon_id_list_, PJOIN_ID_LIST_LEN, sizeof(uint8_t), compare_uint8);
+}
+
+
 void pjon_error_handler(uint8_t code, uint8_t data)
 {
   if(code == CONNECTION_LOST) {
@@ -56,6 +84,7 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
       return sizeof(updatesettings_t)+2;
       break;
     case MSG_PJONID_DOAUTO:
+    case MSG_PJONID_QUESTION:
       return 1;
     case MSG_PJONID_INFO:
     case MSG_PJONID_SET:
@@ -165,9 +194,13 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
     case MSG_PJONID_DOAUTO:
       pjon_startautoiddiscover();
       break;
-    case MSG_PJONID_INFO:
+    case MSG_PJONID_QUESTION:
       //reply to id with our pjon_id
       pjon_identify_myself(id);
+      break;
+    case MSG_PJONID_INFO:
+      //save pjon info somewhere
+      pjoinidlist_add(id);
       break;
     case MSG_PJONID_SET:
       pjon_change_busid(msg->pjonidsetting.pjon_id);
@@ -205,12 +238,29 @@ void pjon_become_master_of_ids()
   pjon_change_busid(1);
   //tell everybody else to get an autoid
   pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  uint16_t w;
+  for (w=0; w<UINT16_MAX; w++)
+    task_pjon();
   //discover id's of everybody else:
-  // wait till all µC replied
+  pjoinidlist_clear();
+  msg.type = MSG_PJONID_QUESTION;
+  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  for (w=0; w<UINT16_MAX; w++)
+    task_pjon();  // wait till all µC replied
   // sort id's numerically
+  pjoinidlist_sort();
   // for ids
   // first id with gap of >0 to previous id .. tell it to decrease id by gapsize
   // continue until all id's linear 0,1,2,3,4 without gap
+  for (uint8_t ii=0; ii<pjon_id_list_idx_; ii++)
+  {
+    if (pjon_id_list_[ii] != ii+1)
+    {
+      msg.type = MSG_PJONID_SET;
+      msg.pjonidsetting.pjon_id = ii+1;
+      pjonbus_.send(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
+    }
+  }
 }
 
 void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
