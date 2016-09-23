@@ -7,20 +7,22 @@
 
 PJON<SoftwareBitBang> pjonbus_;
 
-#define PJOIN_ID_LIST_LEN 10
-uint8_t pjon_id_list_[PJOIN_ID_LIST_LEN];
+// --- PJON ID LIST ---
+
+#define PJON_ID_LIST_LEN 10
+uint8_t pjon_id_list_[PJON_ID_LIST_LEN];
 uint8_t pjon_id_list_idx_ = 0;
 
 void pjoinidlist_clear()
 {
-  for (uint8_t c=0; c < PJOIN_ID_LIST_LEN; c++)
+  for (uint8_t c=0; c < PJON_ID_LIST_LEN; c++)
     pjon_id_list_[c] = 0;
   pjon_id_list_idx_ = 0;
 }
 
 void pjoinidlist_add(uint8_t id)
 {
-  if (pjon_id_list_idx_ < PJOIN_ID_LIST_LEN)
+  if (pjon_id_list_idx_ < PJON_ID_LIST_LEN)
     pjon_id_list_[pjon_id_list_idx_++] = id;
 }
 
@@ -31,7 +33,7 @@ int compare_uint8(const void *v1, const void *v2)
 
 void pjoinidlist_sort()
 {
-  qsort(pjon_id_list_, PJOIN_ID_LIST_LEN, sizeof(uint8_t), compare_uint8);
+  qsort(pjon_id_list_, pjon_id_list_idx_, sizeof(uint8_t), compare_uint8);
 }
 
 
