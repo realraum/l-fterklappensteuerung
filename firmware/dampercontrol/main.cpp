@@ -386,6 +386,7 @@ void handle_serialdata(char c)
         case 'o': damper_target_states_[0] = damper_open_pos_[0]; printf("opening Damper0\r\n"); break;
         case 'c': damper_target_states_[0] = 0; printf("closing Damper0\r\n"); break;
         case 'h': damper_target_states_[0] = damper_open_pos_[0]/2; printf("half-open Damper0\r\n"); break;
+        case 'm': pjon_become_master_of_ids();
         case 's': printSettings(); break;
         case '!': reset2bootloader(); break;
       }

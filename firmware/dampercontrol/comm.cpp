@@ -260,7 +260,8 @@ void pjon_become_master_of_ids()
     {
       msg.type = MSG_PJONID_SET;
       msg.pjonidsetting.pjon_id = ii+1;
-      pjonbus_.send(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
+      if (pjon_id_list_[ii] != msg.pjonidsetting.pjon_id)
+        pjonbus_.send(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
     }
   }
 }

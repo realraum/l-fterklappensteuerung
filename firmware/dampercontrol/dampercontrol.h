@@ -179,6 +179,7 @@ void pjon_senderror_dampertimeout(uint8_t damperid);
 void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* msg);
 void pjon_identify_myself(uint8_t toid);
 void pjon_startautoiddiscover();
+void pjon_become_master_of_ids();
 
 void pressure_sensors_init();
 void task_check_pressure();
