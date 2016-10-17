@@ -276,7 +276,7 @@ void pjon_become_master_of_ids()
 void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
 {
   if (dst == 0 || pjonbus_.device_id() == dst)
-    pjon_recv_handler(pjon_bus_id_, payload, length);
+    pjon_recv_handler(pjon_device_id_, payload, length);
   //hope we did not mangle the payload in recv_handler
   if (dst == 0 || pjonbus_.device_id() != dst)
     pjonbus_.send(dst, (const char*) payload, length);
@@ -311,8 +311,8 @@ void pjon_senderror_dampertimeout(uint8_t damperid)
 
 void pjon_change_busid(uint8_t id)
 {
-  pjon_bus_id_ = id;
-  pjonbus_.set_id(pjon_bus_id_);
+  pjon_device_id_ = id;
+  pjonbus_.set_id(pjon_device_id_);
   saveSettings2EEPROM();
 }
 
@@ -322,15 +322,15 @@ void pjon_init()
   pjonbus_.set_error(pjon_error_handler);
   pjonbus_.set_receiver(pjon_recv_handler);
   pjonbus_.set_pin(PIN_PJON);
-  if (pjon_bus_id_ != NOT_ASSIGNED)
-    pjonbus_.set_id(pjon_bus_id_);
+  if (pjon_device_id_ != NOT_ASSIGNED)
+    pjonbus_.set_id(pjon_device_id_);
   pjonbus_.begin();
-  if (pjon_bus_id_ == NOT_ASSIGNED)
+  if (pjon_device_id_ == NOT_ASSIGNED)
   {
     pjonbus_.acquire_id();
     if (pjonbus_.device_id() != NOT_ASSIGNED)
     {
-      pjon_bus_id_ = pjonbus_.device_id();
+      pjon_device_id_ = pjonbus_.device_id();
       saveSettings2EEPROM();
     }
   }

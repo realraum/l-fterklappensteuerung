@@ -152,7 +152,7 @@ typedef struct {
 extern bool damper_installed_[NUM_DAMPER];
 extern bool sensor_installed_[NUM_DAMPER];
 extern uint8_t damper_open_pos_[NUM_DAMPER];
-extern uint8_t pjon_bus_id_;
+extern uint8_t pjon_device_id_;
 extern uint8_t pjon_sensor_destination_id_;
 
 bool are_all_dampers_closed(void);

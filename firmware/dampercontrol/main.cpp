@@ -320,7 +320,7 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
 void printSettings()
 {
   printf("=== State ===\r\n");
-  printf("PJON device id: %d\r\n", pjon_bus_id_);
+  printf("PJON device id: %d\r\n", pjon_device_id_);
   printf("PJON sensor destid: %d\r\n", pjon_sensor_destination_id_);
   printf("#Dampers: %d\r\n", NUM_DAMPER);
   for (uint8_t d=0; d<NUM_DAMPER; d++) {

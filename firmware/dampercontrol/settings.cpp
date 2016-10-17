@@ -24,7 +24,7 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 // Otherwise the damper_state_ position might overflow and reach 0 before we are at the endstop.
 uint8_t damper_open_pos_[NUM_DAMPER] = {103,103,103};
 
-uint8_t pjon_bus_id_ = 255; //not assigned
+uint8_t pjon_device_id_ = 255; //not assigned
 uint8_t pjon_sensor_destination_id_ = 0; //BROADCAST
 
 
@@ -34,7 +34,7 @@ void saveSettings2EEPROM()
   uint8_t damper_installed=0;
 
   eeprom_write_byte(eeprom_pos++, EEPROM_DATA_VERSION);
-  eeprom_write_byte(eeprom_pos++, pjon_bus_id_);
+  eeprom_write_byte(eeprom_pos++, pjon_device_id_);
   eeprom_write_byte(eeprom_pos++, NUM_DAMPER);
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
@@ -51,7 +51,7 @@ void loadSettingsFromEEPROM()
 
   if (eeprom_read_byte(eeprom_pos++) != EEPROM_DATA_VERSION)
     return;
-  pjon_bus_id_ = eeprom_read_byte(eeprom_pos++);
+  pjon_device_id_ = eeprom_read_byte(eeprom_pos++);
   if (eeprom_read_byte(eeprom_pos++) != NUM_DAMPER)
     return;
   for (uint8_t d=0; d<NUM_DAMPER; d++)
