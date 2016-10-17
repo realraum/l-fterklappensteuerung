@@ -52,6 +52,8 @@ uint8_t fan_target_state_ = FAN_AUTO;
 // ISR sets true if photoelectric fork x went low
 bool damper_endstop_reached_[NUM_DAMPER];
 
+uint8_t stdio_port = 0;
+
 ////// HELPER FUNCTIONS //////
 
 void initSysClkTimer3(void)
@@ -411,17 +413,19 @@ int main()
 
   cpu_init();
   led_init();
-  dualusbio_init();
-  dualusbio_make_stdio(1);
 
   // init
   loadSettingsFromEEPROM();
+
   pjon_init(); //PJON first since it calls arduino init which might do who knows what
   initPINs();
   // initGuessPositionFromEndstop(); //does not work well, since we never really stop exactly at the endstop
   initSysClkTimer3();
   initPCInterrupt();
+
+  dualusbio_init();
   sei();
+  dualusbio_make_stdio(0);
   pressure_sensors_init();
 
   uint16_t loop_count = 0;
@@ -429,20 +433,20 @@ int main()
   // loop
   for (;;)
   {
-    int16_t BytesReceived = dualusbio_bytes_received_std();
+    int16_t BytesReceived = dualusbio_bytes_received(0);
     while(BytesReceived > 0)
     {
-      int ReceivedByte = fgetc(stdin);
+      int ReceivedByte = fgetc(usbio[0]);
       if(ReceivedByte != EOF)
       {
         handle_serialdata(ReceivedByte);
       }
       BytesReceived--;
     }
-    BytesReceived = dualusbio_bytes_received(0);
+    BytesReceived = dualusbio_bytes_received(1);
     while(BytesReceived > 0)
     {
-      int ReceivedByte = fgetc(stdin);
+      int ReceivedByte = fgetc(usbio[1]);
       if(ReceivedByte != EOF)
       {
         handle_serial2pjon(ReceivedByte);
@@ -451,6 +455,7 @@ int main()
     }
 
     dualusbio_task();
+
     if ((loop_count & 0xFFF) == 0)
       task_check_pressure();
     if ((loop_count & 0xFFFF) == 0)
