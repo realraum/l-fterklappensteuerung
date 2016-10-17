@@ -183,27 +183,31 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
       pjon_chaincast_recv_handler(id, (pjon_message_t*) payload);
       break;
     case MSG_PRESSUREINFO:
-      printf("got MSG_PRESSUREINFO\r\n");
+      printf("MSG_PRESSUREINFO\r\n");
       break;
     case MSG_ERROR:
-      printf("got MSG_ERROR\r\n");
+      printf("MSG_ERROR\r\n");
       break;
     case MSG_PJONID_DOAUTO:
+      printf("MSG_PJONID_DOAUTO\r\n");
       pjon_startautoiddiscover();
       break;
     case MSG_PJONID_QUESTION:
+      printf("MSG_PJONID_QUESTION\r\n");
       //reply to id with our pjon_id
       pjon_identify_myself(id);
       break;
     case MSG_PJONID_INFO:
+      printf("MSG_PJONID_INFO\r\n");
       //save pjon info somewhere
       pjoinidlist_add(id);
       break;
     case MSG_PJONID_SET:
+      printf("MSG_PJONID_SET(%d)\r\n",msg->pjonidsetting.pjon_id);
       pjon_change_busid(msg->pjonidsetting.pjon_id);
       break;
     default:
-      printf("Unknown MSG type %d\n", msg->type);
+      printf("Unknown MSG type %d\r\n", msg->type);
       break;
   }
 }
@@ -225,6 +229,14 @@ void pjon_startautoiddiscover()
     _delay_ms(100);
     pjonbus_.acquire_id();
   }
+}
+
+void pjon_broadcast_get_autoid()
+{
+  pjon_message_t msg;
+  msg.type = MSG_PJONID_DOAUTO;
+  //tell everybody else to get an autoid
+  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 void pjon_become_master_of_ids()

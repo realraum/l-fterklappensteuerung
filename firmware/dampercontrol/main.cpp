@@ -381,8 +381,9 @@ void handle_serialdata(char c)
     default:
     case CCMD:
       switch(c) {
-        case 'P': next_char = CDEVID; break;
-        case 'I': next_char = CINSTALLEDDAMPERS; break;
+        case 'P': next_char = CDEVID; break; //set PJON ID
+        case 'I': next_char = CINSTALLEDDAMPERS; break; //set installed dampers
+        case 'A': pjon_broadcast_get_autoid(); break;
         case 'o': damper_target_states_[0] = damper_open_pos_[0]; printf("opening Damper0\r\n"); break;
         case 'c': damper_target_states_[0] = 0; printf("closing Damper0\r\n"); break;
         case 'h': damper_target_states_[0] = damper_open_pos_[0]/2; printf("half-open Damper0\r\n"); break;

@@ -180,6 +180,7 @@ void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* ms
 void pjon_identify_myself(uint8_t toid);
 void pjon_startautoiddiscover();
 void pjon_become_master_of_ids();
+void pjon_broadcast_get_autoid();
 
 void pressure_sensors_init();
 void task_check_pressure();
