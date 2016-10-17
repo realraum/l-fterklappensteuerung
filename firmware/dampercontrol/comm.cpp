@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <util/delay.h>
-#include "dualusbio.h"
+#include "usbio.h"
 #include "Arduino.h"
 #include "PJON.h"
 #include "dampercontrol.h"
@@ -100,13 +100,8 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
 void pjon_printf_msg(uint8_t id, uint8_t *payload, uint8_t length)
 {
   printf("<%02x%02x", id, length);
-  fputc(id, 0);
-  fputc(length, 0);
   for(uint16_t i = 0; i < length; ++i)
-  {
-      fputc(payload[i], 0);
-      printf("%02x",payload[i]);
-  }
+    printf("%02x",payload[i]);
   printf("\r\n");
 }
 

@@ -30,7 +30,7 @@
 
 #include "util.h"
 #include "led.h"
-#include "dualusbio.h"
+#include "usbio.h"
 
 #include "dampercontrol.h"
 
@@ -411,8 +411,7 @@ int main()
 
   cpu_init();
   led_init();
-  dualusbio_init();
-  dualusbio_make_stdio(1);
+  usbio_init();
 
   // init
   loadSettingsFromEEPROM();
@@ -429,7 +428,7 @@ int main()
   // loop
   for (;;)
   {
-    int16_t BytesReceived = dualusbio_bytes_received_std();
+    int16_t BytesReceived = usbio_bytes_received();
     while(BytesReceived > 0)
     {
       int ReceivedByte = fgetc(stdin);
@@ -439,18 +438,8 @@ int main()
       }
       BytesReceived--;
     }
-    BytesReceived = dualusbio_bytes_received(0);
-    while(BytesReceived > 0)
-    {
-      int ReceivedByte = fgetc(stdin);
-      if(ReceivedByte != EOF)
-      {
-        handle_serial2pjon(ReceivedByte);
-      }
-      BytesReceived--;
-    }
 
-    dualusbio_task();
+    usbio_task();
     if ((loop_count & 0xFFF) == 0)
       task_check_pressure();
     if ((loop_count & 0xFFFF) == 0)
