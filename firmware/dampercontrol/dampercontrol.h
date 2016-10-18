@@ -148,6 +148,11 @@ typedef struct {
   };
 } pjon_message_t;
 
+typedef struct { 
+  uint8_t id;
+  uint8_t length;
+  pjon_message_t msg;
+} pjon_message_with_sender_t;
 
 extern bool damper_installed_[NUM_DAMPER];
 extern bool sensor_installed_[NUM_DAMPER];
@@ -171,7 +176,7 @@ void updateInstalledDampersFromChar(uint8_t damper_installed);
 uint8_t getInstalledDampersAsBitfield();
 
 void pjon_init();
-void pjon_change_busid(uint8_t id);
+void pjon_change_deviceid(uint8_t id);
 void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure);

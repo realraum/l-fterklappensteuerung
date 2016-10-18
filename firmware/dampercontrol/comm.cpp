@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <util/delay.h>
+#include <string.h>
 #include "usbio.h"
 #include "Arduino.h"
 #include "PJON.h"
@@ -12,6 +13,11 @@ PJON<SoftwareBitBang> pjonbus_;
 #define PJON_ID_LIST_LEN 10
 uint8_t pjon_id_list_[PJON_ID_LIST_LEN];
 uint8_t pjon_id_list_idx_ = 0;
+
+#define PJON_MSGBUF_LEN 3
+uint8_t pjon_msgbuf_idx_ = 0;
+pjon_message_with_sender_t pjon_msgbuf_[PJON_MSGBUF_LEN];
+
 
 void pjoinidlist_clear()
 {
@@ -58,17 +64,6 @@ void pjon_error_handler(uint8_t code, uint8_t data)
   }
 }
 
-bool pjon_assert_length(uint8_t length, uint8_t expected_length)
-{
-  if (length != expected_length)
-  {
-    printf("PJON Msg got: %d, expected: %d\n", length, expected_length);
-    return false;
-  } else {
-    return true;
-  }
-}
-
 uint8_t pjon_type_to_msg_length(uint8_t type)
 {
   switch(type)
@@ -92,17 +87,45 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
     case MSG_PJONID_SET:
       return sizeof(pjonidsetting_t)+1;
     default:
-      return 0;
+      return 1;
       break;
   }
 }
 
-void pjon_printf_msg(uint8_t id, uint8_t *payload, uint8_t length)
+void pjon_printf_msg(pjon_message_with_sender_t *bufferedmsg)
 {
-  printf("<%02x%02x", id, length);
+  printf("<%02x%02x", bufferedmsg->id, bufferedmsg->length);
+  for(uint16_t i = 0; i < bufferedmsg->length; ++i)
+    printf("%02x",((uint8_t*) &bufferedmsg->msg)[i]);
+  printf("\r\n");
+}
+
+void pjon_debug_send_msg(uint8_t id, const char *payload, uint8_t length)
+{
+  printf(">%02x%02x", id, length);
   for(uint16_t i = 0; i < length; ++i)
     printf("%02x",payload[i]);
   printf("\r\n");
+  pjonbus_.send(id, payload, length);
+}
+
+// Function needs to return as quickly as possible
+// ACK is not sent until after pjon_recv_handler returns
+void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
+{
+  if(length < 1 || length >= sizeof(pjon_message_t)) {
+    //accepting no messages without a type or messages larger than pjon_message_t
+    return;
+  }
+
+  //for some reason memcpy needs to come first, because otherwise if we would write the length first, it would get overwriten.
+  //Not sure how this can be, but it suggest some kind of bug or memory corruption here. Though I'm obviously too blind
+  //to find it right now. (FIXME)
+  memcpy(&(pjon_msgbuf_[pjon_msgbuf_idx_].msg), payload, length);
+  pjon_msgbuf_[pjon_msgbuf_idx_].id = id;
+  pjon_msgbuf_[pjon_msgbuf_idx_].length = length;
+  pjon_msgbuf_idx_++;
+  pjon_msgbuf_idx_%= PJON_MSGBUF_LEN;
 }
 
 bool pjon_chaincast_didreachall(uint8_t bitfield)
@@ -122,15 +145,15 @@ void pjon_chaincast_recv_handler(uint8_t fromid, pjon_message_t *msg)
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
-      printf("got msg_dampercmd\r\n");
+      printf("MSG_DAMPERCMD from %d\r\n",fromid);
       handle_damper_cmd(didreachall, &(msg->chaincast.dampercmd));
       break;
     case MSG_UPDATESETTINGS:
-      printf("got MSG_UPDATESETTINGS\r\n");
+      printf("MSG_UPDATESETTINGS from %d\r\n",fromid);
       updateSettingsFromPacket(&(msg->chaincast.updatesettings));
       break;
     default:
-      printf("Unknown MSG type %d\n", msg->type);
+      printf("Unknown MSG type %d\r\n", msg->type);
       break;
   }
 
@@ -156,59 +179,74 @@ void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* ms
 
   if (next_id > 0)
   {
-    pjonbus_.send(next_id, (char*) msg, pjon_type_to_msg_length(msg->type));
+    // pjonbus_.send(next_id, (char*) msg, pjon_type_to_msg_length(msg->type));
+    pjon_debug_send_msg(next_id, (char*) msg, pjon_type_to_msg_length(msg->type));
   }
 }
 
-void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
+void pjon_postrecv_handle_msg()
 {
-  printf("got message(%d bytes) from %d: '", length, id);
-  if(length < 1) {
-    //accepting no messages without a type
-    printf("\r\n");
-    return;
-  }  
-
-  pjon_message_t *msg = (pjon_message_t *) payload;
-
-  if (!pjon_assert_length(length, pjon_type_to_msg_length(msg->type)))
-  { return; }
-
-  pjon_printf_msg(id, payload, length);
-
-  switch(msg->type)
+  for (uint8_t cc=0; cc < PJON_MSGBUF_LEN; cc++)
   {
-    case MSG_DAMPERCMD:
-    case MSG_UPDATESETTINGS:
-      pjon_chaincast_recv_handler(id, (pjon_message_t*) payload);
-      break;
-    case MSG_PRESSUREINFO:
-      printf("MSG_PRESSUREINFO\r\n");
-      break;
-    case MSG_ERROR:
-      printf("MSG_ERROR\r\n");
-      break;
-    case MSG_PJONID_DOAUTO:
-      printf("MSG_PJONID_DOAUTO\r\n");
-      pjon_startautoiddiscover();
-      break;
-    case MSG_PJONID_QUESTION:
-      printf("MSG_PJONID_QUESTION\r\n");
-      //reply to id with our pjon_id
-      pjon_identify_myself(id);
-      break;
-    case MSG_PJONID_INFO:
-      printf("MSG_PJONID_INFO\r\n");
-      //save pjon info somewhere
-      pjoinidlist_add(id);
-      break;
-    case MSG_PJONID_SET:
-      printf("MSG_PJONID_SET(%d)\r\n",msg->pjonidsetting.pjon_id);
-      pjon_change_busid(msg->pjonidsetting.pjon_id);
-      break;
-    default:
-      printf("Unknown MSG type %d\r\n", msg->type);
-      break;
+    uint8_t c = (pjon_msgbuf_idx_+cc)%PJON_MSGBUF_LEN;
+
+    if (pjon_msgbuf_[c].length == 0)
+      continue; //not a message but empty slot: ignore
+
+    pjon_printf_msg(&pjon_msgbuf_[c]);
+
+    uint8_t id = pjon_msgbuf_[c].id;
+    uint8_t length = pjon_msgbuf_[c].length;
+    pjon_message_t *msg = &(pjon_msgbuf_[c].msg);
+    uint8_t typelen = pjon_type_to_msg_length(msg->type);
+
+    //invalidate slot
+    pjon_msgbuf_[c].id=0;
+    pjon_msgbuf_[c].length=0;
+
+    if (length != typelen)
+    {
+      printf("got msg with invalid length %d of type %d from %d which should have had length %d)\r\n", length, msg->type,id,typelen);
+      continue; //do not accept msg with wrong length
+    }
+
+    switch(msg->type)
+    {
+      case MSG_DAMPERCMD:
+      case MSG_UPDATESETTINGS:
+        pjon_chaincast_recv_handler(id, msg);
+        break;
+      case MSG_PRESSUREINFO:
+        printf("MSG_PRESSUREINFO from %d\r\n",id);
+        break;
+      case MSG_ERROR:
+        printf("MSG_ERROR from %d\r\n",id);
+        break;
+      case MSG_PJONID_DOAUTO:
+        printf("MSG_PJONID_DOAUTO from %d\r\n",id);
+        pjon_startautoiddiscover();
+        break;
+      case MSG_PJONID_QUESTION:
+        printf("MSG_PJONID_QUESTION from %d\r\n",id);
+        //reply to id with our pjon_id
+        pjon_identify_myself(id);
+        break;
+      case MSG_PJONID_INFO:
+        printf("MSG_PJONID_INFO from %d\r\n",id);
+        //save pjon info somewhere
+        pjoinidlist_add(id);
+        break;
+      case MSG_PJONID_SET:
+        printf("MSG_PJONID_SET(%d) from %d\r\n",msg->pjonidsetting.pjon_id,id);
+        pjon_change_deviceid(msg->pjonidsetting.pjon_id);
+        break;
+      case ACQUIRE_ID:
+        printf("ACQUIRE_ID id probe from %d\r\n",id);
+        break;
+      default:
+        printf("Unknown MSG type %d from %d\r\n", msg->type, id);
+        break;
+    }
   }
 }
 
@@ -217,18 +255,23 @@ void pjon_identify_myself(uint8_t toid)
   pjon_message_t msg;
   msg.type = MSG_PJONID_INFO;
   msg.pjonidsetting.pjon_id = pjonbus_.device_id();
-  pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  // pjonbus_.send(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 void pjon_startautoiddiscover()
 {
   _delay_ms(200); // let the bus settle after receiving the broadcast
+  pjonbus_.set_id(NOT_ASSIGNED);
   pjonbus_.acquire_id();
   if (pjonbus_.device_id() == NOT_ASSIGNED)
   {
+    printf("try again acquire_id()\r\n");
     _delay_ms(100);
     pjonbus_.acquire_id();
   }
+  pjon_device_id_ = pjonbus_.device_id();
+  printf("finished pjon acquire_id(), new id: %d\r\n",pjon_device_id_);
 }
 
 void pjon_broadcast_get_autoid()
@@ -236,7 +279,8 @@ void pjon_broadcast_get_autoid()
   pjon_message_t msg;
   msg.type = MSG_PJONID_DOAUTO;
   //tell everybody else to get an autoid
-  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  // pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 void pjon_become_master_of_ids()
@@ -244,16 +288,18 @@ void pjon_become_master_of_ids()
   pjon_message_t msg;
   msg.type = MSG_PJONID_DOAUTO;
   //become #1
-  pjon_change_busid(1);
+  pjon_change_deviceid(1);
   //tell everybody else to get an autoid
-  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  // pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
   uint16_t w;
   for (w=0; w<UINT16_MAX; w++)
     task_pjon();
   //discover id's of everybody else:
   pjoinidlist_clear();
   msg.type = MSG_PJONID_QUESTION;
-  pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  // pjonbus_.send(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
   for (w=0; w<UINT16_MAX; w++)
     task_pjon();  // wait till all µC replied
   // sort id's numerically
@@ -268,7 +314,8 @@ void pjon_become_master_of_ids()
       msg.type = MSG_PJONID_SET;
       msg.pjonidsetting.pjon_id = ii+1;
       if (pjon_id_list_[ii] != msg.pjonidsetting.pjon_id)
-        pjonbus_.send(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
+        // pjonbus_.send(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
+        pjon_debug_send_msg(pjon_id_list_[ii], (const char*) &msg, pjon_type_to_msg_length(msg.type));
     }
   }
 }
@@ -294,8 +341,7 @@ void pjon_send_pressure_infomsg(uint8_t sensorid, float pressure, float temperat
   msg.pressureinfo.sensorid = sensorid;
   msg.pressureinfo.celsius = temperature;
   msg.pressureinfo.pascal = pressure;
-  pjon_printf_msg(pjon_sensor_destination_id_, (uint8_t*) &msg, pjon_type_to_msg_length(msg.type));
-  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
 //sent if damper_states overflows before reaching endstop. May indicate defect endstop!!
@@ -305,11 +351,10 @@ void pjon_senderror_dampertimeout(uint8_t damperid)
   msg.type = MSG_ERROR;
   msg.errorinfo.damperid = damperid;
   msg.errorinfo.errortype = DAMPER_CONTROL_TIMEOUT;
-  pjon_printf_msg(pjon_sensor_destination_id_, (uint8_t*) &msg, pjon_type_to_msg_length(msg.type));
-  pjonbus_.send(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
+  pjon_debug_send_msg(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
-void pjon_change_busid(uint8_t id)
+void pjon_change_deviceid(uint8_t id)
 {
   pjon_device_id_ = id;
   pjonbus_.set_id(pjon_device_id_);
@@ -334,10 +379,17 @@ void pjon_init()
       saveSettings2EEPROM();
     }
   }
+  for (uint8_t c=0; c<PJON_MSGBUF_LEN; c++)
+  {
+    pjon_msgbuf_[c].id=0;
+    pjon_msgbuf_[c].length=0;
+  }
+  pjon_msgbuf_idx_ = 0;
 }
 
 void task_pjon()
 {
     pjonbus_.update();
-    pjonbus_.receive(20); 
+    pjonbus_.receive(64); //PJON sends ACK in receive after callback
+    pjon_postrecv_handle_msg();
 }

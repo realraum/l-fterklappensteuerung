@@ -393,7 +393,7 @@ void handle_serialdata(char c)
       }
     break;
     case CDEVID:
-      pjon_change_busid(c - '0');
+      pjon_change_deviceid(c - '0');
       printf("device id is now: %d\r\n", c - '0');
       next_char = CCMD;
     break;
