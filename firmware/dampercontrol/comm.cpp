@@ -136,7 +136,7 @@ bool pjon_chaincast_didreachall(uint8_t bitfield)
   return ((bitfield & _BV(0)) > 0) && ((bitfield & _BV(1)) > 0) && ((bitfield & _BV(2)) > 0);
 }
 
-void pjon_chaincast_recv_handler(uint8_t fromid, pjon_message_t *msg)
+void pjon_chaincast_recv_handler(uint8_t toid, pjon_message_t *msg)
 {
   //update reach field
   msg->chaincast.reach |= getInstalledDampersAsBitfield();
@@ -145,11 +145,11 @@ void pjon_chaincast_recv_handler(uint8_t fromid, pjon_message_t *msg)
   switch(msg->type)
   {
     case MSG_DAMPERCMD:
-      printf("MSG_DAMPERCMD from %d\r\n",fromid);
+      printf("MSG_DAMPERCMD to %d\r\n",toid);
       handle_damper_cmd(didreachall, &(msg->chaincast.dampercmd));
       break;
     case MSG_UPDATESETTINGS:
-      printf("MSG_UPDATESETTINGS from %d\r\n",fromid);
+      printf("MSG_UPDATESETTINGS to %d\r\n",toid);
       updateSettingsFromPacket(&(msg->chaincast.updatesettings));
       break;
     default:
@@ -157,13 +157,13 @@ void pjon_chaincast_recv_handler(uint8_t fromid, pjon_message_t *msg)
       break;
   }
 
-  pjon_chaincast_forward(fromid, didreachall, msg);
+  pjon_chaincast_forward(toid, didreachall, msg);
 }
 
-void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* msg)
+void pjon_chaincast_forward(uint8_t toid, bool didreachall, pjon_message_t* msg)
 {
   uint8_t next_id = 0;
-  if (fromid == 0)
+  if (toid == 0)
   {
     return; // do not forward broadcasts
   }
@@ -206,7 +206,7 @@ void pjon_postrecv_handle_msg()
 
     if (length != typelen)
     {
-      printf("got msg with invalid length %d of type %d from %d which should have had length %d)\r\n", length, msg->type,id,typelen);
+      printf("got msg with invalid length %d of type %d to id %d which should have had length %d)\r\n", length, msg->type,id,typelen);
       continue; //do not accept msg with wrong length
     }
 
@@ -217,34 +217,34 @@ void pjon_postrecv_handle_msg()
         pjon_chaincast_recv_handler(id, msg);
         break;
       case MSG_PRESSUREINFO:
-        printf("MSG_PRESSUREINFO from %d\r\n",id);
+        printf("MSG_PRESSUREINFO to %d\r\n",id);
         break;
       case MSG_ERROR:
-        printf("MSG_ERROR from %d\r\n",id);
+        printf("MSG_ERROR to %d\r\n",id);
         break;
       case MSG_PJONID_DOAUTO:
-        printf("MSG_PJONID_DOAUTO from %d\r\n",id);
+        printf("MSG_PJONID_DOAUTO to %d\r\n",id);
         pjon_startautoiddiscover();
         break;
       case MSG_PJONID_QUESTION:
-        printf("MSG_PJONID_QUESTION from %d\r\n",id);
+        printf("MSG_PJONID_QUESTION to %d\r\n",id);
         //reply to id with our pjon_id
         pjon_identify_myself(id);
         break;
       case MSG_PJONID_INFO:
-        printf("MSG_PJONID_INFO from %d\r\n",id);
+        printf("MSG_PJONID_INFO to %d\r\n",id);
         //save pjon info somewhere
         pjoinidlist_add(id);
         break;
       case MSG_PJONID_SET:
-        printf("MSG_PJONID_SET(%d) from %d\r\n",msg->pjonidsetting.pjon_id,id);
+        printf("MSG_PJONID_SET(%d) to %d\r\n",msg->pjonidsetting.pjon_id,id);
         pjon_change_deviceid(msg->pjonidsetting.pjon_id);
         break;
       case ACQUIRE_ID:
-        printf("ACQUIRE_ID id probe from %d\r\n",id);
+        printf("ACQUIRE_ID id probe to %d\r\n",id);
         break;
       default:
-        printf("Unknown MSG type %d from %d\r\n", msg->type, id);
+        printf("Unknown MSG type %d to %d\r\n", msg->type, id);
         break;
     }
   }
