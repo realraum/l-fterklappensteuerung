@@ -338,7 +338,8 @@ void printSettings()
 
 enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTDST, CPKTLEN, CPKTDATA};
 
-void handle_serial2pjon(char c)
+//handle chars from second serial interface, or from first after prompt
+next_char_state_t handle_serial2pjon(char c)
 {
   static next_char_state_t next_char = CPKTDST;
   static uint8_t read_num_chars = 0;
@@ -348,6 +349,7 @@ void handle_serial2pjon(char c)
 
   switch (next_char) {
     default:
+    case CCMD:
     case CPKTDST:
       msg_dst = c;
       next_char = CPKTLEN;
@@ -367,12 +369,14 @@ void handle_serial2pjon(char c)
       if (read_num_chars == 0)
       {
         pjon_inject_msg(msg_dst, msg_len, msg_buf);
-        next_char = CPKTDST;
+        next_char = CCMD; //CPKTDST;
       }
       break;
   }
+  return next_char;
 }
 
+//handle serial byte from first ttyACM
 void handle_serialdata(char c)
 {
   static next_char_state_t next_char = CCMD;
@@ -381,6 +385,7 @@ void handle_serialdata(char c)
     default:
     case CCMD:
       switch(c) {
+        case '>': next_char = CPKTDST; break; //inject PJON msg
         case 'P': next_char = CDEVID; break; //set PJON ID
         case 'I': next_char = CINSTALLEDDAMPERS; break; //set installed dampers
         case 'A': pjon_broadcast_get_autoid(); break;
@@ -409,6 +414,10 @@ void handle_serialdata(char c)
       printf("installed dampers updated\r\n");
       next_char = CCMD;
     break;
+    case CPKTDST:
+    case CPKTLEN:
+    case CPKTDATA:
+      next_char = handle_serial2pjon(c); break;
   }
 }
 
