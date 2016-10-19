@@ -361,6 +361,17 @@ void pjon_change_deviceid(uint8_t id)
   saveSettings2EEPROM();
 }
 
+//for testing, simulation and maybe actual work
+void pjon_send_dampercmd(dampercmd_t dcmd)
+{
+  pjon_message_t msg;
+  memcpy(&msg.chaincast.dampercmd.damper,&dcmd.damper,NUM_DAMPER);
+  msg.chaincast.dampercmd.fan = dcmd.fan;
+  msg.chaincast.reach = 0; //empty bitfield
+  msg.type = MSG_DAMPERCMD;
+  pjon_inject_msg(1, pjon_type_to_msg_length(msg.type), (uint8_t*) &msg);
+}
+
 void pjon_init()
 {
   arduino_init();

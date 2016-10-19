@@ -181,6 +181,7 @@ void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload);
 void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload);
 void pjon_send_pressure_infomsg(uint8_t sensorid, float temperature, float pressure);
 void pjon_senderror_dampertimeout(uint8_t damperid);
+void pjon_send_dampercmd(dampercmd_t dcmd);
 void pjon_chaincast_forward(uint8_t fromid, bool didreachall, pjon_message_t* msg);
 void pjon_identify_myself(uint8_t toid);
 void pjon_startautoiddiscover();
