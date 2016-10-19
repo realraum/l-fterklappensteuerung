@@ -378,10 +378,12 @@ void pjon_init()
   pjonbus_.set_error(pjon_error_handler);
   pjonbus_.set_receiver(pjon_recv_handler);
   pjonbus_.set_pin(PIN_PJON);
-  if (pjon_device_id_ != NOT_ASSIGNED)
-    pjonbus_.set_id(pjon_device_id_);
   pjonbus_.begin();
-  if (pjon_device_id_ == NOT_ASSIGNED)
+  if (pjon_device_id_ != NOT_ASSIGNED)
+  {
+    pjonbus_.set_id(pjon_device_id_);
+  }
+  else
   {
     pjonbus_.acquire_id();
     if (pjonbus_.device_id() != NOT_ASSIGNED)
