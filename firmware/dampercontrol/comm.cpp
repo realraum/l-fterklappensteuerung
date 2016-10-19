@@ -305,7 +305,7 @@ void pjon_postrecv_handle_msg()
       case MSG_PJONID_QUESTION:
         printf("MSG_PJONID_QUESTION to %d\r\n",id);
         //reply to id with our pjon_id
-        pjon_identify_myself(id);
+        pjon_identify_myself(1); //send answer to 1 since device 1 is always the one asking this question
         break;
       case MSG_PJONID_INFO:
         printf("MSG_PJONID_INFO to %d\r\n",id);
@@ -327,6 +327,7 @@ void pjon_postrecv_handle_msg()
 }
 
 //reply to a MSG_PJONID_QUESTION broadcast msg with our msgid
+//@arg toid should usually be 1 since this is the id of the new master
 void pjon_identify_myself(uint8_t toid)
 {
   pjon_message_t msg;
@@ -336,12 +337,15 @@ void pjon_identify_myself(uint8_t toid)
   pjon_debug_send_msg(toid, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
+//act on a MSG_PJONID_DOAUTO msg
+//start acquire_id until we heave an id that is != NOT_ASSIGNEd and != 1
+//note that this currently does not actually work, since acquire_id seems to be broken in avr-tools pjon v3
 void pjon_startautoiddiscover()
 {
   _delay_ms(200); // let the bus settle after receiving the broadcast
   pjonbus_.set_id(NOT_ASSIGNED);
   pjonbus_.acquire_id();
-  if (pjonbus_.device_id() == NOT_ASSIGNED)
+  if (pjonbus_.device_id() == NOT_ASSIGNED || pjonbus_.device_id() == 1)
   {
     printf("try again acquire_id()\r\n");
     _delay_ms(100);
