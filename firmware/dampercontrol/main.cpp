@@ -114,9 +114,9 @@ void initGuessPositionFromEndstop()
       damper_target_states_[d] = damper_open_pos_[d];
     } else {
       damper_states_[d] = 0;
-      damper_target_states_[d] = 0;      
+      damper_target_states_[d] = 0;
     }
-  }    
+  }
 }*/
 
 //note includes simulated not-installed dampers
@@ -153,135 +153,15 @@ bool did_damper_pass_endstop(uint8_t damperid)
   return rv;
 }
 
-/// INTERRUPT ROUTINES
-
-/* ISR writes:
- - damper_states_
- - switch_damper_motor
- 
- * ISR reads:
- - damper_target_states_
-
- * ISR only use (read/write):
- - damper_endstop_reached
-
-*/
-
-//called by pinchange interrupt
-void task_check_endstops()
-{
-  for (uint8_t d=0; d<NUM_DAMPER; d++)
-  {
-    if (ENDSTOP_ISHIGH(d) == 0)
-    {
-      damper_endstop_reached_[d] = true;
-    }
-  }  
-}
-
-void task_simulate_pinchange_interrupt()
-{
-  bool interrupt=false;
-  static uint8_t last_state[3] = {0,0,0};
-  for (uint8_t d=0; d<NUM_DAMPER; d++)
-  {
-    uint8_t curstate = ENDSTOP_ISHIGH(d);
-    if (curstate != last_state[d])
-    {
-      printf("pinchange on endstop %d, state:%d\r\n", d, curstate);
-      interrupt=true;
-      last_state[d]=curstate;
-    }
-  }
-  if (interrupt)
-    task_check_endstops();
-}
-
-//called by timer
-void task_control_dampers()
-{
-  for (uint8_t d=0; d<NUM_DAMPER; d++)
-  {
-    if (!damper_installed_[d])
-      continue;
-
-    //here we self-synchronize the position time counter
-    if (did_damper_pass_endstop(d))
-      damper_states_[d] = 0;
-
-    //send warning, since we timed out and that might mean the endstop does not work
-    //(0x80 << sizeof(damper_states_[0]))-1 is the max-value of uint8_t aka 0xFF
-    if (damper_target_states_[d] == 0 && damper_states_[d] == (0x80 << sizeof(damper_states_[0]))-1)
-      damper_state_overflowed_[d] = true;
-
-    if (damper_states_[d] != damper_target_states_[d])
-    {
-      //move motor
-      DAMPER_MOTOR_RUN(d);
-      //increment position time counter if we are moving
-      damper_states_[d]++;
-      // printf("Motor %d Run @%d\r\n", d, damper_states_[d]);
-    } else {
-      //stop motor
-      DAMPER_MOTOR_STOP(d);
-      // printf("Motor %d Stop @%d\r\n", d, damper_states_[d]);
-    }
-  }
-}
-
-ISR(TIMER3_COMPA_vect)
-{
-  //called every TIME_TICK (aka 8ms)
-  task_control_dampers();
-  //set up "clock" comparator for next tick
-  OCR3A = (OCR3A + TICK_TIME) & 0xFFFF;
-/*  if (debug_)
-    led_toggle();
-*/
-}
-
-//https://sites.google.com/site/qeewiki/books/avr-guide/external-interrupts-on-the-atmega328
-ISR(PCINT0_vect)
-{
-  task_check_endstops();
-}
-
-/// TASKS
-void task_control_fan()
-{
-  switch (fan_target_state_) {
-    case FAN_OFF:
-    // switching off can always be done right away
-    FAN_STOP;
-    break;
-    
-    default:
-    case FAN_AUTO:
-    case FAN_ON:
-    // once dampers have reached their target and if at least one damper is not closed, we switch the fan on
-    if (have_dampers_reached_target() && !are_all_dampers_closed())
-      FAN_RUN;
-    else
-      FAN_STOP;
-    break;
-  }
-}
-
-void task_check_damper_state_overflow()
-{
-  for (uint8_t d=0; d<NUM_DAMPER; d++)
-  {
-    if (damper_state_overflowed_[d])
-    {
-      damper_state_overflowed_[d] = false;
-      pjon_senderror_dampertimeout(d);
-    }
-  }
-}
-
-//FAN: if to be switched off: do it right away
-//FAN: if to be switched on: wait until pkt reached everyone
-
+//Act on a remote (or injected) command to open/close dampers and start/stop fan (dampercmd_t)
+//
+//Thanks to what we call chaincasting, each dampercmd_t will reach us twice.
+//once with didreachall unset and later with didreachall set
+//@var didreachall if this is set, we know that all other µC acknowledged the same message
+//
+//Dampers: move them right away, when didreachall is still false
+//FAN: if to be switched off: do it right away (didreachall == false)
+//FAN: if to be switched on: wait until pkt reached everyone (didreachall == true)
 void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
 {
   if (didreachall) //only switch fan if we know all dampers got the message
@@ -316,6 +196,9 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
     }
   }
 }
+
+
+///////////////// Serial Interface and Debugging Code ////////////////////
 
 void printSettings()
 {
@@ -421,6 +304,153 @@ void handle_serialdata(char c)
   }
 }
 
+
+/////////////// TASKS ////////////////////
+////// repeatedly called from main ///////
+
+/// INTERRUPT ROUTINES
+
+/* ISR writes:
+ - damper_states_
+ - switch_damper_motor
+
+ * ISR reads:
+ - damper_target_states_
+
+ * ISR only use (read/write):
+ - damper_endstop_reached
+
+*/
+
+//called by pinchange interrupt
+//set's flag if a particular endstop has been reached
+//which can be checked at leasure by calling did_damper_pass_endstop(x)
+void task_check_endstops()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (ENDSTOP_ISHIGH(d) == 0)
+    {
+      damper_endstop_reached_[d] = true;
+    }
+  }
+}
+
+//instead of calling task_check_endstops in an interrupt routine
+//we could call this task repeatedly in case we don't want to use interrupts
+void task_simulate_pinchange_interrupt()
+{
+  bool interrupt=false;
+  static uint8_t last_state[3] = {0,0,0};
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    uint8_t curstate = ENDSTOP_ISHIGH(d);
+    if (curstate != last_state[d])
+    {
+      printf("pinchange on endstop %d, state:%d\r\n", d, curstate);
+      interrupt=true;
+      last_state[d]=curstate;
+    }
+  }
+  if (interrupt)
+    task_check_endstops();
+}
+
+//called by timer TIMER3_COMPA_vect
+//for each damper whose position != target_position:
+// - let motor move
+// - increment counter until target_position is reached
+//for each damper whose position == target_position:
+// - stop motor
+//self-synchronize position (which is guessed from time elapsed) each time we pass endstop
+void task_control_dampers()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (!damper_installed_[d])
+      continue;
+
+    //here we self-synchronize the position time counter
+    if (did_damper_pass_endstop(d))
+      damper_states_[d] = 0;
+
+    //send warning, since we timed out and that might mean the endstop does not work
+    //(0x80 << sizeof(damper_states_[0]))-1 is the max-value of uint8_t aka 0xFF
+    if (damper_target_states_[d] == 0 && damper_states_[d] == (0x80 << sizeof(damper_states_[0]))-1)
+      damper_state_overflowed_[d] = true;
+
+    if (damper_states_[d] != damper_target_states_[d])
+    {
+      //move motor
+      DAMPER_MOTOR_RUN(d);
+      //increment position time counter if we are moving
+      damper_states_[d]++;
+      // printf("Motor %d Run @%d\r\n", d, damper_states_[d]);
+    } else {
+      //stop motor
+      DAMPER_MOTOR_STOP(d);
+      // printf("Motor %d Stop @%d\r\n", d, damper_states_[d]);
+    }
+  }
+}
+
+//enable/disable the fan SSR
+//depending on fan_target_state_ and state of local dampers
+//note that remote dampers are consideren insofar that fan_target_state_ does not get set to FAN_AUTO|FAN_ON unless the message has sucessfully passed all µC
+void task_control_fan()
+{
+  switch (fan_target_state_) {
+    case FAN_OFF:
+    // switching off can always be done right away
+    FAN_STOP;
+    break;
+
+    default:
+    case FAN_AUTO:
+    case FAN_ON:
+    // once dampers have reached their target and if at least one damper is not closed, we switch the fan on
+    if (have_dampers_reached_target() && !are_all_dampers_closed())
+      FAN_RUN;
+    else
+      FAN_STOP;
+    break;
+  }
+}
+
+void task_check_damper_state_overflow()
+{
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    if (damper_state_overflowed_[d])
+    {
+      damper_state_overflowed_[d] = false;
+      pjon_senderror_dampertimeout(d);
+    }
+  }
+}
+
+
+///////////////// Interrupt Handlers ////////////////////
+
+ISR(TIMER3_COMPA_vect)
+{
+  //called every TIME_TICK (aka 8ms)
+  task_control_dampers();
+  //set up "clock" comparator for next tick
+  OCR3A = (OCR3A + TICK_TIME) & 0xFFFF;
+/*  if (debug_)
+    led_toggle();
+*/
+}
+
+//https://sites.google.com/site/qeewiki/books/avr-guide/external-interrupts-on-the-atmega328
+ISR(PCINT0_vect)
+{
+  task_check_endstops();
+}
+
+
+///////////////// MAIN ////////////////////
 int main()
 {
   MCUSR &= ~(1 << WDRF);

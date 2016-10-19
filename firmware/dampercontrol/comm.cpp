@@ -1,3 +1,25 @@
+/*
+ *  Damper Control Firmware
+ *
+ *
+ *  Copyright (C) 2016 Bernhard Tittelbach <xro@realraum.at>
+ *
+ *  This software is made with love and spreadspace avr utils.
+ *
+ *  Damper Control Firmware is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This firmware is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with these files. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <util/delay.h>
 #include <string.h>
@@ -18,6 +40,9 @@ uint8_t pjon_id_list_idx_ = 0;
 uint8_t pjon_msgbuf_idx_ = 0;
 pjon_message_with_sender_t pjon_msgbuf_[PJON_MSGBUF_LEN];
 
+///////// PJON List ///////////
+// These methods implement a list of PJON_ID_LIST_LEN bytes
+// which implements 3 operations: clear, add, sort
 
 void pjoinidlist_clear()
 {
@@ -43,6 +68,8 @@ void pjoinidlist_sort()
 }
 
 
+///////// PJON Callback Handler for Errors ///////////
+
 void pjon_error_handler(uint8_t code, uint8_t data)
 {
   if(code == CONNECTION_LOST) {
@@ -64,6 +91,35 @@ void pjon_error_handler(uint8_t code, uint8_t data)
   }
 }
 
+
+///////// PJON Callback Handler for incoming messages ///////////
+
+// Called by PJON when a message in incoming
+// Function needs to return as quickly as possible
+// since ACK is not sent until after pjon_recv_handler returns
+// thus the message is not actually handled here but saved in a roundbuffer of size PJON_MSGBUF_LEN
+// where pjon_postrecv_handle_msg can handle it later.
+void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
+{
+  if(length < 1 || length >= sizeof(pjon_message_t)) {
+    //accepting no messages without a type or messages larger than pjon_message_t
+    return;
+  }
+
+  //for some reason memcpy needs to come first, because otherwise if we would write the length first, it would get overwriten.
+  //Not sure how this can be, but it suggest some kind of bug or memory corruption here. Though I'm obviously too blind
+  //to find it right now. (FIXME)
+  memcpy(&(pjon_msgbuf_[pjon_msgbuf_idx_].msg), payload, length);
+  pjon_msgbuf_[pjon_msgbuf_idx_].id = id;
+  pjon_msgbuf_[pjon_msgbuf_idx_].length = length;
+  pjon_msgbuf_idx_++;
+  pjon_msgbuf_idx_%= PJON_MSGBUF_LEN;
+}
+
+
+///////// Helper Functions ///////////
+
+//for each MSG type defined in dampercontrol.h return the length of the msg in bytes
 uint8_t pjon_type_to_msg_length(uint8_t type)
 {
   switch(type)
@@ -92,6 +148,7 @@ uint8_t pjon_type_to_msg_length(uint8_t type)
   }
 }
 
+//DEBUG: print a pjon msg to tty
 void pjon_printf_msg(pjon_message_with_sender_t *bufferedmsg)
 {
   printf("<%02x%02x", bufferedmsg->id, bufferedmsg->length);
@@ -100,6 +157,7 @@ void pjon_printf_msg(pjon_message_with_sender_t *bufferedmsg)
   printf("\r\n");
 }
 
+//DEBUG: send a pjon msg while also printing it to tty
 void pjon_debug_send_msg(uint8_t id, const char *payload, uint8_t length)
 {
   printf(">%02x%02x", id, length);
@@ -109,25 +167,29 @@ void pjon_debug_send_msg(uint8_t id, const char *payload, uint8_t length)
   pjonbus_.send(id, payload, length);
 }
 
-// Function needs to return as quickly as possible
-// ACK is not sent until after pjon_recv_handler returns
-void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
-{
-  if(length < 1 || length >= sizeof(pjon_message_t)) {
-    //accepting no messages without a type or messages larger than pjon_message_t
-    return;
-  }
+///////// Chaincasting ///////////////
 
-  //for some reason memcpy needs to come first, because otherwise if we would write the length first, it would get overwriten.
-  //Not sure how this can be, but it suggest some kind of bug or memory corruption here. Though I'm obviously too blind
-  //to find it right now. (FIXME)
-  memcpy(&(pjon_msgbuf_[pjon_msgbuf_idx_].msg), payload, length);
-  pjon_msgbuf_[pjon_msgbuf_idx_].id = id;
-  pjon_msgbuf_[pjon_msgbuf_idx_].length = length;
-  pjon_msgbuf_idx_++;
-  pjon_msgbuf_idx_%= PJON_MSGBUF_LEN;
-}
+//Since PJON broadcasts are not acknowleged and have turned out to not be reliable,
+//I thought up a nice little scheme I call "Chaincasting"
+//(another possible name would be "Laddercasting")
+//
+//Basically a chaincast message is always sent to or origintates from pjonid 1 (bottom of the ladder)
+//On reception, during the first pass, each µC
+//1. sets a bit in the message, indiciating he recieved it (actually one bit for each dumper is set)
+//2. handles the message (pjon_chaincast_recv_handler)
+//3. forwards the message to the next higher message id (ascend ladder)
+//
+//once all required bits in the msg header are set, the second pass starts
+//On reception, during the first pass, each µC
+//1. handles the message (pjon_chaincast_recv_handler) in the knowledge that all other µC have now seen the same msg
+//2. forwards the message to the next lower message id (descend ladder)
+//
+//This requires that µC have been give PJON device ids in sequential order
+//To ensure this is always the case, a method pjon_become_master_of_ids() was written.
+//Basically it talks to every µC on the bus and gives them new id's in sequential order.
 
+
+//check bitfield if all damper bits are set
 bool pjon_chaincast_didreachall(uint8_t bitfield)
 {
   #if NUM_DAMPER != 3
@@ -136,6 +198,12 @@ bool pjon_chaincast_didreachall(uint8_t bitfield)
   return ((bitfield & _BV(0)) > 0) && ((bitfield & _BV(1)) > 0) && ((bitfield & _BV(2)) > 0);
 }
 
+//handle recieved message of type pjon_chaincast_t
+//
+//1. see if message already reached everyone (second pass, didreachall==true)
+//   or if this is the first time we see it (first pass, didreachall==false)
+//2. call handler for msg->type
+//3. forward message to other µC on pjon-bus
 void pjon_chaincast_recv_handler(uint8_t toid, pjon_message_t *msg)
 {
   //update reach field
@@ -160,6 +228,7 @@ void pjon_chaincast_recv_handler(uint8_t toid, pjon_message_t *msg)
   pjon_chaincast_forward(toid, didreachall, msg);
 }
 
+//forward chaincast message to µC with next higher (first pass) or next lower (second pass) deviceid
 void pjon_chaincast_forward(uint8_t toid, bool didreachall, pjon_message_t* msg)
 {
   uint8_t next_id = 0;
@@ -184,6 +253,13 @@ void pjon_chaincast_forward(uint8_t toid, bool didreachall, pjon_message_t* msg)
   }
 }
 
+///////// Message Handler ///////////////
+
+//Handle already received messages saved in roundbuffer
+//go through every slot in the roundbuffer and see if
+//the msg is new (length > 0)
+//then call the appropriate handler after some sanity checks
+//and mark the slot as handled by setting length = 0
 void pjon_postrecv_handle_msg()
 {
   for (uint8_t cc=0; cc < PJON_MSGBUF_LEN; cc++)
@@ -250,6 +326,7 @@ void pjon_postrecv_handle_msg()
   }
 }
 
+//reply to a MSG_PJONID_QUESTION broadcast msg with our msgid
 void pjon_identify_myself(uint8_t toid)
 {
   pjon_message_t msg;

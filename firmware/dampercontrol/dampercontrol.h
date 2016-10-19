@@ -1,3 +1,25 @@
+/*
+ *  Damper Control Firmware
+ *
+ *
+ *  Copyright (C) 2016 Bernhard Tittelbach <xro@realraum.at>
+ *
+ *  This software is made with love and spreadspace avr utils.
+ *
+ *  Damper Control Firmware is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This firmware is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with these files. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #ifndef DAMPER_CONTROL_H
 #define DAMPER_CONTROL_H
 
@@ -5,7 +27,7 @@
 /* Hardware: AVR ATMEGA32U4 (Arduino Pro Micro)
  * PinOut: https://deskthority.net/wiki/Arduino_Pro_Micro
  *
- * 
+ *
  * ==== PINS ====
  * PD0... SPI Sensor1 CS
  * PD1... SPI Sensor0 CS
@@ -148,7 +170,7 @@ typedef struct {
   };
 } pjon_message_t;
 
-typedef struct { 
+typedef struct {
   uint8_t id;
   uint8_t length;
   pjon_message_t msg;
