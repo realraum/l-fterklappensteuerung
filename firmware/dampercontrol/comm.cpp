@@ -119,6 +119,13 @@ void pjon_recv_handler(uint8_t id, uint8_t *payload, uint8_t length)
 
 ///////// Helper Functions ///////////
 
+void pjon_change_deviceid(uint8_t id)
+{
+  pjon_device_id_ = id;
+  pjonbus_.set_id(pjon_device_id_);
+  saveSettings2EEPROM();
+}
+
 //for each MSG type defined in dampercontrol.h return the length of the msg in bytes
 uint8_t pjon_type_to_msg_length(uint8_t type)
 {
@@ -165,6 +172,22 @@ void pjon_debug_send_msg(uint8_t id, const char *payload, uint8_t length)
     printf("%02x",payload[i]);
   printf("\r\n");
   pjonbus_.send(id, payload, length);
+}
+
+//send a message to the pjon bus while
+//also sending it to ourselves
+void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
+{
+  if (dst == 0 || pjonbus_.device_id() == dst)
+    pjon_recv_handler(pjon_device_id_, payload, length);
+  //hope we did not mangle the payload in recv_handler
+  if (dst == 0 || pjonbus_.device_id() != dst)
+    pjonbus_.send(dst, (const char*) payload, length);
+}
+
+void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
+{
+  pjon_inject_msg(BROADCAST, length, payload);
 }
 
 ///////// Chaincasting ///////////////
@@ -326,6 +349,8 @@ void pjon_postrecv_handle_msg()
   }
 }
 
+///////// Sending and Handling various types of messages ///////////////
+
 //reply to a MSG_PJONID_QUESTION broadcast msg with our msgid
 //@arg toid should usually be 1 since this is the id of the new master
 void pjon_identify_myself(uint8_t toid)
@@ -355,6 +380,7 @@ void pjon_startautoiddiscover()
   printf("finished pjon acquire_id(), new id: %d\r\n",pjon_device_id_);
 }
 
+//broadcast msg MSG_PJONID_DOAUTO to all µC telling them to run pjon_startautoiddiscover
 void pjon_broadcast_get_autoid()
 {
   pjon_message_t msg;
@@ -364,6 +390,7 @@ void pjon_broadcast_get_autoid()
   pjon_debug_send_msg(BROADCAST, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
+//become device id 1 and assign every other µC a sequentialy incremential id
 void pjon_become_master_of_ids()
 {
   pjon_message_t msg;
@@ -401,20 +428,6 @@ void pjon_become_master_of_ids()
   }
 }
 
-void pjon_inject_msg(uint8_t dst, uint8_t length, uint8_t *payload)
-{
-  if (dst == 0 || pjonbus_.device_id() == dst)
-    pjon_recv_handler(pjon_device_id_, payload, length);
-  //hope we did not mangle the payload in recv_handler
-  if (dst == 0 || pjonbus_.device_id() != dst)
-    pjonbus_.send(dst, (const char*) payload, length);
-}
-
-void pjon_inject_broadcast_msg(uint8_t length, uint8_t *payload)
-{
-  pjon_inject_msg(BROADCAST, length, payload);
-}
-
 void pjon_send_pressure_infomsg(uint8_t sensorid, float pressure, float temperature)
 {
   pjon_message_t msg;
@@ -435,13 +448,6 @@ void pjon_senderror_dampertimeout(uint8_t damperid)
   pjon_debug_send_msg(pjon_sensor_destination_id_, (char*) &msg, pjon_type_to_msg_length(msg.type));
 }
 
-void pjon_change_deviceid(uint8_t id)
-{
-  pjon_device_id_ = id;
-  pjonbus_.set_id(pjon_device_id_);
-  saveSettings2EEPROM();
-}
-
 //for testing, simulation and maybe actual work
 void pjon_send_dampercmd(dampercmd_t dcmd)
 {
@@ -452,6 +458,8 @@ void pjon_send_dampercmd(dampercmd_t dcmd)
   msg.type = MSG_DAMPERCMD;
   pjon_inject_msg(1, pjon_type_to_msg_length(msg.type), (uint8_t*) &msg);
 }
+
+///////// Initialize PJON bus and data structures ///////////////
 
 void pjon_init()
 {
@@ -480,6 +488,8 @@ void pjon_init()
   }
   pjon_msgbuf_idx_ = 0;
 }
+
+///////// PJON task, called periodically by main() ///////////////
 
 void task_pjon()
 {
