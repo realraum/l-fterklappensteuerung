@@ -177,22 +177,24 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
         fan_target_state_ = FAN_OFF;
         break;
     }
-  } else { // presume we got the message on it's first way through
-    for (uint8_t d=0; d<NUM_DAMPER; d++)
+  }
+  //on top of ladder, message will be received only once,
+  //so we set dampers every time we get the message
+  //even if most µC will get it twice. They start setting the damper early then
+  for (uint8_t d=0; d<NUM_DAMPER; d++)
+  {
+    switch(rxmsg->damper[d])
     {
-      switch(rxmsg->damper[d])
-      {
-        default:
-        case DAMPER_CLOSED:
-          damper_target_states_[d] = 0;
-          break;
-        case DAMPER_OPEN:
-          damper_target_states_[d] = damper_open_pos_[d];
-          break;
-        case DAMPER_HALFOPEN:
-          damper_target_states_[d] = damper_open_pos_[d] / 2;
-          break;
-      }
+      default:
+      case DAMPER_CLOSED:
+        damper_target_states_[d] = 0;
+        break;
+      case DAMPER_OPEN:
+        damper_target_states_[d] = damper_open_pos_[d];
+        break;
+      case DAMPER_HALFOPEN:
+        damper_target_states_[d] = damper_open_pos_[d] / 2;
+        break;
     }
   }
 }
