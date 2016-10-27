@@ -278,10 +278,26 @@ void handle_serialdata(char c)
         case '4': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_CLOSED},FAN_AUTO}); break;
         case '5': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
         case '6': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_OPEN},FAN_AUTO}); break;
+        case '7': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_OPEN},FAN_AUTO}); break;
         case '0': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_CLOSED,DAMPER_CLOSED},FAN_OFF}); break;
-        case 'o': damper_target_states_[0] = damper_open_pos_[0]; printf("opening Damper0\r\n"); break;
-        case 'c': damper_target_states_[0] = 0; printf("closing Damper0\r\n"); break;
-        case 'h': damper_target_states_[0] = damper_open_pos_[0]/2; printf("half-open Damper0\r\n"); break;
+        case 'o':
+          damper_target_states_[0] = damper_open_pos_[0];
+          damper_target_states_[1] = damper_open_pos_[1];
+          damper_target_states_[2] = damper_open_pos_[2];
+          printf("opening Damper0..3\r\n");
+          break;
+        case 'c':
+          damper_target_states_[0] = 0;
+          damper_target_states_[1] = 0;
+          damper_target_states_[2] = 0;
+          printf("closing Damper0..3\r\n");
+          break;
+        case 'h':
+          damper_target_states_[0] = damper_open_pos_[0]/2;
+          damper_target_states_[1] = damper_open_pos_[1]/2;
+          damper_target_states_[2] = damper_open_pos_[2]/2;
+          printf("half-open Damper0..3\r\n");
+          break;
         case 'm': pjon_become_master_of_ids(); break;
         case 's': printSettings(); break;
         case '!': reset2bootloader(); break;
