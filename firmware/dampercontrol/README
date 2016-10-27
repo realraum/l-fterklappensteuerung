@@ -8,36 +8,31 @@ Pressure Sensor code needs to be added. Work on adding bmp180 lib to avr-utils n
 
 ## Close Damper 0, Open Damers 1,2 and set FAN to Auto
 
-echo -ne ">\x05\x00\x00\x01\x01\02" >| /dev/ttyACM3
+echo -ne ">\x01\x06\x00\x00\x00\x01\x01\x02" >| /dev/ttyACM3
 
 ## Open Damper 0,1,2 and set FAN to On
 
-echo -ne ">\x05\x00\x01\x01\x01\01" >| /dev/ttyACM3
+echo -ne ">\x01\x06\x00\x00\x01\x01\x01\x01" >| /dev/ttyACM3
 
 ## Close all Dampers, Set Fan to ON
 (not: fan won't start if all dampers closed)
-echo -ne ">\x05\x00\x00\x00\x00\01" >| /dev/ttyACM3                                                                                        
+echo -ne ">\x01\x06\x00\x00\x00\x00\x00\x01" >| /dev/ttyACM3
 
 ## Set Damper0 to Half-Open, Damper1 and 2 to Open and Fan to OFF
 
-echo -ne ">\x05\x00\x02\x01\x01\00" >| /dev/ttyACM3                                                                                        
+echo -ne ">\x01\x06\x00\x00\x02\x01\x01\x00" >| /dev/ttyACM3
 
 ## Set Damper0 to Half-Open, Damper1 and 2 to Open and Fan to AUTO
 
-echo -ne ">\x05\x00\x02\x01\x01\02" >| /dev/ttyACM3 
+echo -ne ">\x01\x06\x00\x00\x02\x01\x01\x02" >| /dev/ttyACM3
 
-## Set damper-open-position to 128 for all 3 dampers:
+## Set damper-open-position to 103,103 for damper 0,1 and 80 for damper 2:
 
-echo -ne ">\x04\x03\x80\x80\x80" >| /dev/ttyACM3
+Those seem to be the optimal settings
+
+echo -ne ">\x01\x05\x03\x07\x67\x67\x50" >| /dev/ttyACM3
 
 
 ===== TODO =====
 
-- handle pjon_send return values (BUSY, ACK, NACK, FAIL) .. try again.. ?
 - maybe better handle pjon_error_handler
-- right now fan does not activate if non-enabled dampers on fan-µc are opened and fan-µc dampers are closed ---> maybe broadcast success or leverage ACK packets?
-  really want to avoid remembering and syncing state of other µCs
-- instead of broadcast.. maybe chain messages.. first send to id0, id0 sends to id1 while appending which dampers it has enabled, and so on until all µc with all dampers enabled have been reached..
-  if we know we only have 2 µc the ack from id1 to id2 would already be sufficient, otherwise last sends broadcast of final state... and then fan opens
-- note: lost packet has already happened in test
-(in testing) use ttyACM0 (exclusively for pjon) and ttyACM1 (for debugging)

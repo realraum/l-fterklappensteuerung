@@ -41,6 +41,9 @@ MosFET: IPP029N06N, reicht für 5V
 Freilaufdiode parallel zum Motor, gegen Stromrichtung, sollte für >8A dimensioniert sein
 SBL10L25 od. Ähnliches
 
+Zieht recht viel >>5A Strom wenn all 3 Motoren sich gleichzeitig bewegen.
+--> gleichzeitiges verstellen vermeiden und/oder besseres Netzteil
+Für 2 Motoren-operationen gleichzeitig ist das 5A Netzteil ausreichend
 
 
 ===== Gabellichtschranken =====
@@ -53,6 +56,13 @@ SBL10L25 od. Ähnliches
 BMP280
 
 
+===== PJON Bus ====
+
+470 Ohm Serienwiderstand zwischen µC PJON Pin und und PJON Bus
+  (um Flanken zu Dämpfen)
+2.2MOhm Parallelwiederstand zw PJON und GND an jedem µC
+  (als Pulldown, weil Bus sich als Kapazität langsam auflädt und der µC dann nur mehr High-Level sieht)
+2.5nF Parallel zw PJON Bus und GND an jedem µC als Tiefpass für PJON Freq
 ==== TODO ====
 
 test SSR directly am Teensy:

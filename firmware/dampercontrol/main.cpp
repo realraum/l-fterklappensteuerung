@@ -276,7 +276,7 @@ void handle_serialdata(char c)
         case 'A': pjon_broadcast_get_autoid(); break;
         case '1': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_CLOSED},FAN_AUTO}); break;
         case '2': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_CLOSED},FAN_AUTO}); break;
-        case '3': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
+        case '3': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
         case '4': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_CLOSED},FAN_AUTO}); break;
         case '5': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
         case '6': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_OPEN},FAN_AUTO}); break;
