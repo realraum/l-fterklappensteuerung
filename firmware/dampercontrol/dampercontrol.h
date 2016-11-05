@@ -43,8 +43,9 @@
  * PF4... Damper Motor 0
  * PF5... Damper Motor 1
  * PF6... Damper Motor 2
- * PC6... PJON Pin
- * PD7... Ventilation Fan (Teensy2LED)
+ * PC6... Ventilation Fan of Laminaflow
+ * PD7... PJON Pin
+ * PE6... Main Ventilation Fan (Teensy2LED)
  * PF0/PF7... =ADC0 needed by PJON
 */
 
@@ -68,6 +69,8 @@
 #define REG_DAMPER_2 PINF
 #define PIN_FAN PE6
 #define REG_FAN PINE
+#define PIN_FANLAMINA PC6
+#define REG_FANLAMINA PINC
 
 //aka PD7
 // see ../contrib/avr-utils/lib/arduino-leonardo/pins_arduino.h
@@ -112,6 +115,10 @@
 #define FAN_STOP PIN_HIGH(REG_FAN,PIN_FAN)
 #define FAN_ISRUNNING ((PORTREG(REG_FAN) & _BV(PIN_FAN)) == 0)
 
+#define FANLAMINA_RUN  PIN_LOW(REG_FANLAMINA,PIN_FANLAMINA)
+#define FANLAMINA_STOP PIN_HIGH(REG_FANLAMINA,PIN_FANLAMINA)
+#define FANLAMINA_ISRUNNING ((PORTREG(REG_FANLAMINA) & _BV(PIN_FANLAMINA)) == 0)
+
 #define CS_SENSOR_0(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S0),PIN_CS_S0,LOWHIGH))
 #define CS_SENSOR_1(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S1),PIN_CS_S1,LOWHIGH))
 #define CS_SENSOR_2(LOWHIGH) (PIN_SW(PORTREG(REG_CS_S2),PIN_CS_S2,LOWHIGH))
@@ -131,6 +138,7 @@ enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
 typedef struct {
   uint8_t damper[NUM_DAMPER];
   uint8_t fan : 2;
+  uint8_t fanlamina : 2;
 } dampercmd_t;
 
 typedef struct {
