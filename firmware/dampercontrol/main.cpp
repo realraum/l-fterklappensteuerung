@@ -48,6 +48,7 @@ uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
 bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
 
 uint8_t fan_target_state_ = FAN_OFF;
+uint8_t fanlamina_target_state_ = FAN_OFF;
 
 // ISR sets true if photoelectric fork x went low
 bool damper_endstop_reached_[NUM_DAMPER];
@@ -171,9 +172,12 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
       case FAN_ON:
       case FAN_OFF:
         fan_target_state_ = rxmsg->fan;
+        if (rxmsg->damper[LAMINA_DAMPER_ID] != DAMPER_CLOSED)
+          fanlamina_target_state_ = rxmsg->fanlamina;
         break;
       default:
         fan_target_state_ = FAN_OFF;
+        fanlamina_target_state_ = FAN_OFF;
         break;
     }
   }
@@ -217,7 +221,8 @@ void printSettings()
       printf("\t Pressure: %.2f Pa @ %.2f degC\r\n", (double) get_latest_pressure(d), (double) get_latest_temperature(d));
     }
   }
-  printf("Fan is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fan_target_state_);
+  printf("Fan Main is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fan_target_state_);
+  printf("Fan Laminaflow is %s and set to %d\r\n", (FAN_ISRUNNING)?"on":"off", fanlamina_target_state_);
 }
 
 enum next_char_state_t {CCMD, CDEVID, CINSTALLEDDAMPERS, CPKTDST, CPKTLEN, CPKTDATA};
@@ -429,6 +434,21 @@ void task_control_fan()
       FAN_RUN;
     else
       FAN_STOP;
+    break;
+  }
+  switch (fanlamina_target_state_) {
+    case FAN_OFF:
+    // switching off can always be done right away
+    FANLAMINA_STOP;
+    break;
+
+    default:
+    case FAN_ON:
+    // once dampers 2 is open and other fan is running and target state has been reached, switch on fan 2
+    if (have_dampers_reached_target() && FAN_ISRUNNING)
+      FANLAMINA_RUN;
+    else
+      FANLAMINA_STOP;
     break;
   }
 }
