@@ -131,14 +131,14 @@
 
 enum pjon_msg_type_t {MSG_DAMPERCMD, MSG_PRESSUREINFO, MSG_ERROR, MSG_UPDATESETTINGS, MSG_PJONID_DOAUTO, MSG_PJONID_QUESTION, MSG_PJONID_INFO, MSG_PJONID_SET};
 enum damper_cmds_t {DAMPER_CLOSED, DAMPER_OPEN, DAMPER_HALFOPEN};
-enum fan_cmds_t {FAN_OFF, FAN_ON, FAN_AUTO};
+enum fan_cmds_t {FAN_OFF=0, FAN_ON=1};
 enum error_type_t {NO_ERROR, DAMPER_CONTROL_TIMEOUT};
 
 
 typedef struct {
   uint8_t damper[NUM_DAMPER];
-  uint8_t fan : 2;
-  uint8_t fanlamina : 2;
+  uint8_t fan : 1;
+  uint8_t fanlamina : 1;
 } dampercmd_t;
 
 typedef struct {

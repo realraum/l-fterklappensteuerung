@@ -47,7 +47,7 @@ uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
 
 bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
 
-uint8_t fan_target_state_ = FAN_AUTO;
+uint8_t fan_target_state_ = FAN_OFF;
 
 // ISR sets true if photoelectric fork x went low
 bool damper_endstop_reached_[NUM_DAMPER];
@@ -168,7 +168,6 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
   {
     switch (rxmsg->fan)
     {
-      case FAN_AUTO:
       case FAN_ON:
       case FAN_OFF:
         fan_target_state_ = rxmsg->fan;
@@ -274,13 +273,13 @@ void handle_serialdata(char c)
         case 'P': next_char = CDEVID; break; //set PJON ID
         case 'I': next_char = CINSTALLEDDAMPERS; break; //set installed dampers
         case 'A': pjon_broadcast_get_autoid(); break;
-        case '1': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_CLOSED},FAN_AUTO}); break;
-        case '2': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_CLOSED},FAN_AUTO}); break;
-        case '3': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
-        case '4': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_CLOSED},FAN_AUTO}); break;
-        case '5': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_OPEN},FAN_AUTO}); break;
-        case '6': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_OPEN},FAN_AUTO}); break;
-        case '7': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_OPEN},FAN_AUTO}); break;
+        case '1': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_CLOSED},FAN_ON}); break;
+        case '2': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_CLOSED},FAN_ON}); break;
+        case '3': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_CLOSED,DAMPER_OPEN},FAN_ON}); break;
+        case '4': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_CLOSED},FAN_ON}); break;
+        case '5': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_CLOSED,DAMPER_OPEN},FAN_ON}); break;
+        case '6': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_OPEN,DAMPER_OPEN},FAN_ON}); break;
+        case '7': pjon_send_dampercmd(dampercmd_t{{DAMPER_OPEN,DAMPER_OPEN,DAMPER_OPEN},FAN_ON}); break;
         case '0': pjon_send_dampercmd(dampercmd_t{{DAMPER_CLOSED,DAMPER_CLOSED,DAMPER_CLOSED},FAN_OFF}); break;
         case 'o':
           damper_target_states_[0] = damper_open_pos_[0];
@@ -414,7 +413,7 @@ void task_control_dampers()
 
 //enable/disable the fan SSR
 //depending on fan_target_state_ and state of local dampers
-//note that remote dampers are consideren insofar that fan_target_state_ does not get set to FAN_AUTO|FAN_ON unless the message has sucessfully passed all µC
+//note that remote dampers are consideren insofar that fan_target_state_ does not get set to FAN_ON unless the message has sucessfully passed all µC
 void task_control_fan()
 {
   switch (fan_target_state_) {
@@ -424,7 +423,6 @@ void task_control_fan()
     break;
 
     default:
-    case FAN_AUTO:
     case FAN_ON:
     // once dampers have reached their target and if at least one damper is not closed, we switch the fan on
     if (have_dampers_reached_target() && !are_all_dampers_closed())
