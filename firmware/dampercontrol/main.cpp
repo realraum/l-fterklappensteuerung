@@ -45,10 +45,13 @@ uint8_t damper_states_[NUM_DAMPER] = {1,1,1};
 //damper target states: the state that damper states is supposed to reach
 uint8_t damper_target_states_[NUM_DAMPER] = {0,0,0};
 
-bool damper_state_overflowed_[NUM_DAMPER] = {false,false,false};
+uint8_t damper_state_overflow_ctr_[NUM_DAMPER] = {0,0,0};
+uint8_t damper_state_overflow_last_notified_[NUM_DAMPER] = {0,0,0};
 
 uint8_t fan_target_state_ = FAN_OFF;
 uint8_t fanlamina_target_state_ = FAN_OFF;
+
+uint16_t schedule_tryclosedamperagain_after_=0;
 
 // ISR sets true if photoelectric fork x went low
 bool damper_endstop_reached_[NUM_DAMPER];
@@ -202,6 +205,11 @@ void handle_damper_cmd(bool didreachall, dampercmd_t *rxmsg)
   }
 }
 
+void force_close_synchronize_damper(uint8_t damperid )
+{
+  damper_states_[damperid] = 1; //BAD: here we write the damper_states, something that only the interrupt handler should do
+  damper_target_states_[damperid] = 0;
+}
 
 ///////////////// Serial Interface and Debugging Code ////////////////////
 
@@ -392,14 +400,18 @@ void task_control_dampers()
     if (!damper_installed_[d])
       continue;
 
-    //here we self-synchronize the position time counter
-    if (did_damper_pass_endstop(d))
-      damper_states_[d] = 0;
-
     //send warning, since we timed out and that might mean the endstop does not work
     //(0x80 << sizeof(damper_states_[0]))-1 is the max-value of uint8_t aka 0xFF
     if (damper_target_states_[d] == 0 && damper_states_[d] == (0x80 << sizeof(damper_states_[0]))-1)
-      damper_state_overflowed_[d] = true;
+      damper_state_overflow_ctr_[d]++;
+
+    //here we self-synchronize the position time counter
+    if (did_damper_pass_endstop(d))
+    {
+      damper_states_[d] = 0;
+      damper_state_overflow_ctr_[d] = 0;
+    }
+
 
     if (damper_states_[d] != damper_target_states_[d])
     {
@@ -457,11 +469,37 @@ void task_check_damper_state_overflow()
 {
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-    if (damper_state_overflowed_[d])
+    if (damper_state_overflow_ctr_[d] > damper_state_overflow_last_notified_[d] || (damper_state_overflow_ctr_[d] == 0 && damper_state_overflow_ctr_[d] == (uint8_t)-1))
     {
-      damper_state_overflowed_[d] = false;
       pjon_senderror_dampertimeout(d);
+      damper_state_overflow_last_notified_[d] = damper_state_overflow_ctr_[d];
     }
+  }
+  if (schedule_tryclosedamperagain_after_==0)
+  {
+    for (uint8_t d=0; d<NUM_DAMPER; d++)
+    {
+      //if first overflow... try again later
+      if (damper_state_overflow_ctr_[d] == 1)
+      {
+        //wait damper_open_pos_[d]*2*pjon_id timeslots
+        //this nicely wraps around just like ticktime_++ does, so we have a time schedules even if addition overflows
+        schedule_tryclosedamperagain_after_ = (200*(uint16_t)(pjon_device_id_%16));
+      }
+    }
+    //TODO: we might miss this windows... so think of something better
+  } else if (schedule_tryclosedamperagain_after_==1) {
+    for (uint8_t d=0; d<NUM_DAMPER; d++)
+    {
+      //if still first overflow (no new cmds and target states in the meantime that failed)... try again now
+      if (damper_state_overflow_ctr_[d] == 1)
+      {
+        //wait damper_open_pos_[d]*2*pjon_id timeslots
+        //this nicely wraps around just like ticktime_++ does, so we have a time schedules even if addition overflows
+        force_close_synchronize_damper(d);
+      }
+    }
+
   }
 }
 
@@ -483,6 +521,8 @@ ISR(TIMER3_COMPA_vect)
 ISR(PCINT0_vect)
 {
   task_check_endstops();
+  if (schedule_tryclosedamperagain_after_>0)
+    schedule_tryclosedamperagain_after_--;
 }
 
 
