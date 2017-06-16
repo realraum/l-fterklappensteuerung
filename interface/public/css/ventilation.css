@@ -1,0 +1,58 @@
+body {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+.content { 
+ }
+
+.controlgroup {
+	vertical-align: top;
+	width:20vw;
+	display:inline-block;
+	border: 3px solid black;
+	margin:1vmin;
+ }
+
+.controlname {
+	padding-top:4vh;
+	padding-bottom:4vh;
+	padding-left:1vw;
+	padding-right:1vw;
+	width:100%;
+	padding:0;
+	margin-top:0vh;
+	margin-bottom:1vw;
+	margin-left:0;
+	margin-right:0;
+	vertical-align: middle;
+	font-size:5vmin;
+	text-align: center;
+	background:black;
+	color:white;
+ }
+
+.controlstate {
+	padding-top:4vh;
+	padding-bottom:4vh;
+	padding-left:1vw;
+	height:10vh;
+	padding-right:1vw;
+	width:100%;
+	padding:0;
+	margin-top:1vh;
+	margin-bottom:1vw;
+	margin-left:0;
+	margin-right:0;
+	font-size:5vmin;
+	text-align: center;
+	background:lightgray;
+	display:flex;
+    align-items: center; /* Vertical center alignment */
+    justify-content: center;
+    cursor: initial;
+ }
+
+.controlstate.active {
+	background:lime;
+}
