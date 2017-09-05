@@ -9,7 +9,9 @@ var wsctx_ventchange = "ventchange";
 function handleExternalControlStateChange(data) {
 	$(".controlstate").removeClass("active");
 	Object.keys(data).forEach(function(name)  {
-		$(".controlstate[name="+name+"][state="+data[name]+"]").addClass("active");
+		if (data[name]) {
+			$(".controlstate[name="+name+"][state="+data[name]+"]").addClass("active");
+		}
 	});
 }
 

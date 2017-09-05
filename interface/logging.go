@@ -37,8 +37,8 @@ func LogEnable(logtypes ...string) {
 		case "ALL":
 			LogMain_ = log.New(os.Stderr, "MAIN"+" ", log.LstdFlags)
 			LogWS_ = log.New(os.Stderr, "WS"+" ", log.LstdFlags)
-			LogVent_ = log.New(os.Stderr, "RPC"+" ", log.LstdFlags)
-			LogSerial_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
+			LogVent_ = log.New(os.Stderr, "VENT"+" ", log.LstdFlags)
+			LogSerial_ = log.New(os.Stderr, "SERIAL"+" ", log.LstdFlags)
 		}
 	}
 }
