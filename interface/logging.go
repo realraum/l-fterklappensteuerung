@@ -10,15 +10,17 @@ type NullWriter struct{}
 func (n *NullWriter) Write(p []byte) (int, error) { return len(p), nil }
 
 var (
-	LogMain_ *log.Logger
-	LogWS_   *log.Logger
-	LogVent_ *log.Logger
+	LogMain_   *log.Logger
+	LogWS_     *log.Logger
+	LogVent_   *log.Logger
+	LogSerial_ *log.Logger
 )
 
 func init() {
 	LogMain_ = log.New(&NullWriter{}, "", 0)
 	LogWS_ = log.New(&NullWriter{}, "", 0)
 	LogVent_ = log.New(&NullWriter{}, "", 0)
+	LogSerial_ = log.New(&NullWriter{}, "", 0)
 }
 
 func LogEnable(logtypes ...string) {
@@ -30,10 +32,13 @@ func LogEnable(logtypes ...string) {
 			LogWS_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
 		case "VENT":
 			LogVent_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
+		case "SERIAL":
+			LogSerial_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
 		case "ALL":
 			LogMain_ = log.New(os.Stderr, "MAIN"+" ", log.LstdFlags)
 			LogWS_ = log.New(os.Stderr, "WS"+" ", log.LstdFlags)
 			LogVent_ = log.New(os.Stderr, "RPC"+" ", log.LstdFlags)
+			LogSerial_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
 		}
 	}
 }

@@ -24,10 +24,12 @@ const (
 
 var (
 	DebugFlags_ string
+	TeensyTTY_  string
 )
 
 func init() {
 	flag.StringVar(&DebugFlags_, "debug", "", "List of DebugFlags separated by ,")
+	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "Teensy Serial Device")
 }
 
 func main() {
