@@ -63,7 +63,7 @@ func goMarshalJsonForAllClients(ps *pubsub.PubSub) {
 	defer ps.Unsub(udpate_c, PS_DAMPERSCHANGED)
 	init_c := ps.Sub(PS_GETSTATEFORNEWCLIENT)
 	defer ps.Unsub(init_c, PS_GETSTATEFORNEWCLIENT)
-	var initial_info []byte
+	var initial_info []byte = []byte("{}")
 	for {
 		select {
 		case <-shutdown_c:

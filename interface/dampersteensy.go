@@ -67,6 +67,9 @@ func mkDamperCmdMsg(newstate wsChangeVent) []byte {
 	return buf[0:i]
 }
 
+//TODO: decode and handle error msg if damper did not reach endstop in time
+//      --> repeat cmd for that damper
+
 func goChangeDampers(ps *pubsub.PubSub) {
 	newstate_c := ps.Sub(PS_DAMPERSCHANGED)
 	shutdown_c := ps.SubOnce("shutdown")
@@ -87,6 +90,7 @@ func goChangeDampers(ps *pubsub.PubSub) {
 				LogVent_.Print("ToPJON:", cmdbytes)
 				teensytty_wr <- cmdbytes
 			}
+			//TODO: maybe some delay before we send next cmd?
 		case line := <-teensytty_rd:
 			LogVent_.Print("FromPJON:", line)
 		}
