@@ -1,0 +1,15 @@
+[Unit]
+Description=Control Ventilation
+Wants=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3s
+WorkingDirectory=/home/pi/bin/
+#EnvironmentFile=/home/pi/.config/ventilationinterface.env
+ExecStart=/home/pi/bin/ventilationinterface
+SyslogIdentifier=%i
+
+[Install]
+WantedBy=default.target
