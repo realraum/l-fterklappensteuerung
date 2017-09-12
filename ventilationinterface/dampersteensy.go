@@ -46,11 +46,7 @@ func mkDamperCmdMsg(newstate wsChangeVent) []byte {
 		return nil
 	}
 	i++
-	buf[i] = damperteensy_cmdmap[newstate.Fan] // Laminaflow Fan
-	if inmap == false {
-		return nil
-	}
-	buf[i] |= damperteensy_cmdmap[newstate.Fan] << 1 // Fan
+	buf[i] |= damperteensy_cmdmap[newstate.Fan] // Fan
 	if inmap == false {
 		return nil
 	}
