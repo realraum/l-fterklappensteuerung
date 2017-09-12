@@ -17,7 +17,7 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-#mount / -o remount,ro
+mount / -o remount,ro
 
 exit 0
 

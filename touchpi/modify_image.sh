@@ -19,10 +19,11 @@ local LOOPDEV=/dev/mapper/loop0
 extendimage() {
   truncate -s $((1024*1024*6907)) $TARGETIMAGE
   #dd if=/dev/zero bs=1M count=3600 >> $TARGETIMAGE
-  echo -e "n\np\n3\n$((0x6a5000))\n\np\nw\n" | fdisk $TARGETIMAGE
+  echo -e "n\np\n3\n$((0x400000))\n$((0x600000))\nn\np\n$((0x601000))\n\np\nw\n" | fdisk $TARGETIMAGE
 }
 
 umountimage() {
+  [ -e ${LOOPDEV}p4 ] && sudo umount ${LOOPDEV}p4
   [ -e ${LOOPDEV}p3 ] && sudo umount ${LOOPDEV}p3
   [ -e ${LOOPDEV}p1 ] && sudo umount ${LOOPDEV}p1
   sudo umount ${LOOPDEV}p2
@@ -37,10 +38,17 @@ mountimagemvvar() {
     sudo mount ${LOOPDEV}p2 $MOUNTPTH -o acl
     sudo mount ${LOOPDEV}p1 $MOUNTPTH/boot
     if [[ -e ${LOOPDEV}p3 ]] ; then
-        if ! sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/var; then
-            sudo mkfs -L var -t ext4 ${LOOPDEV}p3 || exit 2
+        if ! sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/home; then
+            sudo mkfs -L home -t ext4 ${LOOPDEV}p3 || exit 2
             mvvar
-            sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/var
+            sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/home -o acl
+        fi
+    fi
+    if [[ -e ${LOOPDEV}p4 ]] ; then
+        if ! sudo mount ${LOOPDEV}p4 ${MOUNTPTH}/var; then
+            sudo mkfs -L var -t ext4 ${LOOPDEV}p4 || exit 2
+            mvvar
+            sudo mount ${LOOPDEV}p4 ${MOUNTPTH}/var
         fi
     fi
 }
@@ -48,9 +56,12 @@ mountimagemvvar() {
 mvvar() {
   local TDIR=$(mktemp -d)
   sudo mount ${LOOPDEV}p3 $TDIR
-  sudo mv ${MOUNTPTH}/var/*(D) ${TDIR}/
-  sync
+  sudo mv ${MOUNTPTH}/home/*(D) ${TDIR}/
   sudo umount ${LOOPDEV}p3
+  sudo mount ${LOOPDEV}p4 $TDIR
+  sudo mv ${MOUNTPTH}/var/*(D) ${TDIR}/
+  sudo umount ${LOOPDEV}p4
+  sync
 }
 
 runchroot() {
