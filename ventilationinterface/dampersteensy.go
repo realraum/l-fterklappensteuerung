@@ -1,6 +1,10 @@
 package main
 
-import "github.com/btittelbach/pubsub"
+import (
+	"time"
+
+	"github.com/btittelbach/pubsub"
+)
 
 type SerialLine []byte
 
@@ -58,7 +62,13 @@ func mkDamperCmdMsg(newstate wsChangeVent) []byte {
 //TODO: decode and handle error msg if damper did not reach endstop in time
 //      --> repeat cmd for that damper
 
-func goChangeDampers(ps *pubsub.PubSub) {
+// if vent position changed, we may want to way a bit until sending the next vent position change command
+// in order to not overtax the 12V power supply. Should really be implemented in the µC
+func didVentPositionChange(a, b wsChangeVent) bool {
+	return a.Damper1 != b.Damper1 || a.Damper2 != b.Damper2 || a.Damper3 != b.Damper3
+}
+
+func goChangeDampers(ps *pubsub.PubSub, min_cmd_send_interval time.Duration) {
 	newstate_c := ps.Sub(PS_DAMPERSCHANGED)
 	shutdown_c := ps.SubOnce("shutdown")
 	defer ps.Unsub(newstate_c, PS_DAMPERSCHANGED)
@@ -66,6 +76,8 @@ func goChangeDampers(ps *pubsub.PubSub) {
 	if teensytty_err != nil {
 		panic(teensytty_err)
 	}
+	var last_cmd_time time.Time
+	var last_state wsChangeVent
 
 	for {
 		select {
@@ -73,12 +85,18 @@ func goChangeDampers(ps *pubsub.PubSub) {
 			return
 		case newstate := <-newstate_c:
 			LogVent_.Print("CmdFromWeb:", newstate.(wsChangeVent))
-			cmdbytes := mkDamperCmdMsg(newstate.(wsChangeVent))
+			vent_position_changed := didVentPositionChange(last_state, newstate.(wsChangeVent))
+			last_state = newstate.(wsChangeVent)
+			cmdbytes := mkDamperCmdMsg(last_state)
 			if cmdbytes != nil && len(cmdbytes) > 0 {
+				if vent_position_changed && time.Now().Sub(last_cmd_time) < min_cmd_send_interval {
+					LogVent_.Print("cmds too fast, delaying..", cmdbytes)
+					time.Sleep(min_cmd_send_interval - time.Now().Sub(last_cmd_time))
+				}
 				LogVent_.Print("ToPJON:", cmdbytes)
 				teensytty_wr <- cmdbytes
+				last_cmd_time = time.Now()
 			}
-			//TODO: maybe some delay before we send next cmd?
 		case line := <-teensytty_rd:
 			LogVent_.Print("FromPJON:", line)
 		}

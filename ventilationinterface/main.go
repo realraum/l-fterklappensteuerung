@@ -23,13 +23,15 @@ const (
 )
 
 var (
-	DebugFlags_ string
-	TeensyTTY_  string
+	DebugFlags_            string
+	TeensyTTY_             string
+	MinVentChangeInterval_ time.Duration
 )
 
 func init() {
-	flag.StringVar(&DebugFlags_, "debug", "", "List of DebugFlags separated by ,")
-	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "Teensy Serial Device")
+	flag.StringVar(&DebugFlags_, "debug", "", "List of debug flags separated by , or ALL")
+	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "µC serial device")
+	flag.DurationVar(&MinVentChangeInterval_, "mininterval", 1500*time.Millisecond, "Min Invervall between sending cmds to µC")
 }
 
 func main() {
@@ -50,7 +52,7 @@ func MainThatReallyIsTheRealMain() {
 	defer ps.Pub(true, "shutdown")
 
 	go RunMartini(ps)
-	go goChangeDampers(ps)
+	go goChangeDampers(ps, MinVentChangeInterval_)
 
 	// wait on Ctrl-C or sigInt or sigKill
 	func() {
