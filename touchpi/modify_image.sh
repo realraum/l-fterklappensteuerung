@@ -38,9 +38,9 @@ mountimagemvvar() {
     sudo mount ${LOOPDEV}p2 $MOUNTPTH -o acl
     sudo mount ${LOOPDEV}p1 $MOUNTPTH/boot
     if [[ -e ${LOOPDEV}p3 ]] ; then
-        if ! sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/home; then
+        if ! sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/home -o acl; then
             sudo mkfs -L home -t ext4 ${LOOPDEV}p3 || exit 2
-            mvvar
+            mvhome
             sudo mount ${LOOPDEV}p3 ${MOUNTPTH}/home -o acl
         fi
     fi
@@ -53,11 +53,16 @@ mountimagemvvar() {
     fi
 }
 
-mvvar() {
+mvhome() {
   local TDIR=$(mktemp -d)
   sudo mount ${LOOPDEV}p3 $TDIR
   sudo mv ${MOUNTPTH}/home/*(D) ${TDIR}/
   sudo umount ${LOOPDEV}p3
+  sync
+}
+
+mvvar() {
+  local TDIR=$(mktemp -d)
   sudo mount ${LOOPDEV}p4 $TDIR
   sudo mv ${MOUNTPTH}/var/*(D) ${TDIR}/
   sudo umount ${LOOPDEV}p4
