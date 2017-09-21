@@ -78,6 +78,12 @@ modifyBootConfigForTouch() {
   cat $CONFIGTXTAPPEND | sudo tee -a "$uenv"
 }
 
+disabledhcpfor() {
+  local interfaces="${1:-usb0}"
+  local dhcpcdconf="$MOUNTPTH/etc/dhcpcd.conf"
+  echo -e "\ndenyinterfaces $interfaces" | sudo tee -a "$dhcpcdconf"
+}
+
 gobuildandcp() {
 ( cd "$1"
   export GOARCH=arm
@@ -114,6 +120,7 @@ cat $MYSSHPUBKEY | sudo tee -a ${MOUNTPTH}/root/.ssh/authorized_keys
 cat $MYSSHPUBKEY | sudo tee -a ${MOUNTPTH}/home/pi/.ssh/authorized_keys
 
 modifyBootConfigForTouch "$MOUNTPTH/boot/config.txt"
+disabledhcpfor "eth0"
 sudo cp -rf ${MOUNTPTH}/usr/share/X11/xorg.conf.d/10-evdev.conf ${MOUNTPTH}/usr/share/X11/xorg.conf.d/45-evdev.conf                                 
 
 gobuildandcp ../ventilationinterface ${MOUNTPTH}/home/pi/bin/
