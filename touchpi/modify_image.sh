@@ -104,7 +104,10 @@ trap umountimage EXIT
 runchroot /bin/bash < $APTSCRIPT
 
 ## settings and stuff
+## change local permissions first... really evil but convenient
+sudo chown root:root -R ${LOCALROOT}/^home
 sudo rsync -var ${LOCALROOT}/  ${MOUNTPTH}/
+sudo chown $USER:$USER -R ${LOCALROOT}/
 
 ## newest zsh config
 cp ~/.zshrc ~/.zshrc.local ${MOUNTPTH}/home/pi/
