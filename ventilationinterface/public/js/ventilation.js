@@ -29,6 +29,14 @@ function handleControlStateChange(event) {
 	sendControlStateUpdate();
 }
 
+function ShowWaitingForConnection() {
+    $("div.waitingoverlay").css("display","initial");
+}
+
+function ShowConnectionEstablished() {
+	$("div.waitingoverlay").css("display","none");
+}
+
 (function() {
   webSocketSupport = hasWebSocketSupport();
 
@@ -37,6 +45,8 @@ function handleControlStateChange(event) {
 	$(".controlstate").on("click",handleControlStateChange);
 
     ws.registerContext(wsctx_ventchange,handleExternalControlStateChange);
+    ws.onopen = ShowConnectionEstablished;
+    ws.ondisconnect = ShowWaitingForConnection;
     ws.open(webSocketUrl);
   }
 })();
