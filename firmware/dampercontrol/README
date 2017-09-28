@@ -45,11 +45,11 @@ echo -ne ">\x01\x06\x00\x00\x02\x01\x01\x00" >| /dev/ttyACM3
 
 echo -ne ">\x01\x06\x00\x00\x02\x01\x01\x01" >| /dev/ttyACM3
 
-## Set damper-open-position to 103,103 for damper 0,1 and 80 for damper 2:
+## Set damper-open-position to 80 for damper 0,1 and for damper 2:
 
 Those seem to be the optimal settings
 
-echo -ne ">\x01\x05\x03\x07\x67\x67\x50" >| /dev/ttyACM3
+echo -ne ">\x01\x05\x03\x07\x50\x50\x50" >| /dev/ttyACM3
 
 
 ===== TODO =====

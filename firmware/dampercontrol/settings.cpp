@@ -44,7 +44,7 @@ bool sensor_installed_[NUM_DAMPER] = {false, false, false};
 // so this does not work out. Thus we have to choose a TICK_DURATION_IN_MS > 7 and a damper_open_pos < 128.
 // This way we can at least garantee that we always stop at the endstop (if the endstop works) if we close.
 // Otherwise the damper_state_ position might overflow and reach 0 before we are at the endstop.
-uint8_t damper_open_pos_[NUM_DAMPER] = {103,103,103};
+uint8_t damper_open_pos_[NUM_DAMPER] = {80,80,80};
 
 uint8_t pjon_device_id_ = 255; //not assigned
 uint8_t pjon_sensor_destination_id_ = 0; //BROADCAST
