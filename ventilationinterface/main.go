@@ -56,6 +56,7 @@ func MainThatReallyIsTheRealMain() {
 	defer ps.Pub(true, "shutdown")
 
 	go RunMartini(ps)
+	go goSanityCheckDamperRequests(ps)
 	go goChangeDampers(ps, MinVentChangeInterval_)
 
 	// wait on Ctrl-C or sigInt or sigKill

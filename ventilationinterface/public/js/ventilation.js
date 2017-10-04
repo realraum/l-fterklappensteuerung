@@ -5,6 +5,8 @@ var webSocketUrl = 'ws://'+window.location.hostname+'/sock';
 var webSocketSupport = null;
 
 var wsctx_ventchange = "ventchange";
+var wsctx_error = "error";
+var wsctx_lock = "lock";
 
 function handleExternalControlStateChange(data) {
 	$(".controlstate").removeClass("active");
@@ -29,6 +31,16 @@ function handleControlStateChange(event) {
 	sendControlStateUpdate();
 }
 
+function displayErrorMsg(msg, duration) {
+	$("#error-msg").text(msg);
+	$("div.erroroverlay").css("display","table");
+	setTimeout(function() {$("div.erroroverlay").css("display","none");}, duration);
+}
+
+function handleErrorMsg(data) {
+	displayErrorMsg(data.msg, 1100);
+}
+
 function ShowWaitingForConnection() {
     $("div.waitingoverlay").css("display","initial");
 }
@@ -45,6 +57,7 @@ function ShowConnectionEstablished() {
 	$(".controlstate").on("click",handleControlStateChange);
 
     ws.registerContext(wsctx_ventchange,handleExternalControlStateChange);
+    ws.registerContext(wsctx_error,handleErrorMsg);
     ws.onopen = ShowConnectionEstablished;
     ws.ondisconnect = ShowWaitingForConnection;
     ws.open(webSocketUrl);

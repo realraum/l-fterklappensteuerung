@@ -182,15 +182,10 @@ WSREADLOOP:
 				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
 				continue WSREADLOOP
 			}
-			if wserr := sanityCheckRequestedVentilationState(data, client_is_local); wserr == nil {
+			if sanityCheckRequestedVentilationState(&data) {
 				ps.Pub(DamperRequest{request: data, islocal: client_is_local, toclient_chan: toclient_chan}, PS_DAMPERREQUEST)
 			} else {
-				replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: wserr})
-				if err != nil {
-					LogWS_.Print(err)
-					continue WSREADLOOP
-				}
-				toclient_chan <- replydata
+				LogWS_.Println("Invalid Data received", data)
 			}
 		case ws_ctx_login:
 			var data wsLogin
@@ -207,7 +202,6 @@ WSREADLOOP:
 					continue WSREADLOOP
 				}
 				toclient_chan <- replydata
-
 			}
 		case ws_ctx_lock:
 			var data wsLock
