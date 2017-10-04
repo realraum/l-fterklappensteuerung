@@ -13,6 +13,12 @@ import (
 
 const (
 	ws_ctx_ventchange      = "ventchange"
+	ws_ctx_login           = "login"
+	ws_ctx_error           = "error"
+	ws_ctx_lock            = "lock"
+	ws_error_none          = "none"             //info msg only not an error
+	ws_error_prohibited    = "prohibited"       //requested dangerous or generally prohibited state
+	ws_error_notauth       = "notauthenticated" //state that can only be activated with local auth token
 	ws_damper_state_closed = "closed"
 	ws_damper_state_half   = "halfopen"
 	ws_damper_state_open   = "open"
@@ -28,6 +34,20 @@ type wsMessage struct {
 type wsMessageOut struct {
 	Ctx  string      `json:"ctx"`
 	Data interface{} `json:"data"`
+}
+
+type wsLogin struct {
+	Token string `json:"token"`
+}
+
+type wsError struct {
+	Type string `json:"type"`
+	Msg  string `json:"msg"`
+}
+
+type wsLock struct {
+	OLGALock  bool `json:"olga"`
+	LaserLock bool `json:"laser"`
 }
 
 type wsChangeVent struct {
@@ -131,7 +151,7 @@ func goTalkWithClient(w http.ResponseWriter, r *http.Request, ps *pubsub.PubSub)
 
 	// NOTE: no call to ws.WriteMessage in this function after this call
 	// ONLY goWriteToClient writes to client
-	toclient_chan := make(chan []byte, 10)
+	toclient_chan := make(chan []byte, 128)
 	defer close(toclient_chan)
 	go goWriteToClient(ws, toclient_chan, ps)
 
@@ -140,6 +160,9 @@ func goTalkWithClient(w http.ResponseWriter, r *http.Request, ps *pubsub.PubSub)
 	ws.SetReadDeadline(time.Now().Add(ws_read_timeout_))
 	// the PongHandler will set the read deadline for next messages if pings arrive
 	ws.SetPongHandler(func(string) error { ws.SetReadDeadline(time.Now().Add(ws_read_timeout_)); return nil })
+
+	client_is_local := false
+
 WSREADLOOP:
 	for {
 		var v wsMessage
@@ -159,7 +182,42 @@ WSREADLOOP:
 				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
 				continue WSREADLOOP
 			}
-			ps.Pub(data, PS_DAMPERSCHANGED)
+			if wserr := sanityCheckRequestedVentilationState(data, client_is_local); wserr == nil {
+				ps.Pub(DamperRequest{request: data, islocal: client_is_local, toclient_chan: toclient_chan}, PS_DAMPERREQUEST)
+			} else {
+				replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: wserr})
+				if err != nil {
+					LogWS_.Print(err)
+					continue WSREADLOOP
+				}
+				toclient_chan <- replydata
+			}
+		case ws_ctx_login:
+			var data wsLogin
+			err = mapstructure.Decode(v.Data, &data)
+			if err != nil {
+				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
+				continue WSREADLOOP
+			}
+			if data.Token == LocalAuthToken_ {
+				client_is_local = true
+				replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: wsError{Type: ws_error_none, Msg: "Welcome local client"}})
+				if err != nil {
+					LogWS_.Print(err)
+					continue WSREADLOOP
+				}
+				toclient_chan <- replydata
+
+			}
+		case ws_ctx_lock:
+			var data wsLock
+			err = mapstructure.Decode(v.Data, &data)
+			if err != nil {
+				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
+				continue WSREADLOOP
+			}
+			data.LaserLock = false //can't set laserlock via web, only via mqtt
+			ps.Pub(data, PS_LOCKUPDATES)
 		}
 	}
 }

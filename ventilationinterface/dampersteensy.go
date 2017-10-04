@@ -86,6 +86,9 @@ func goChangeDampers(ps *pubsub.PubSub, min_cmd_send_interval time.Duration) {
 		case newstate := <-newstate_c:
 			LogVent_.Print("CmdFromWeb:", newstate.(wsChangeVent))
 			vent_position_changed := didVentPositionChange(last_state, newstate.(wsChangeVent))
+			if newstate.(wsChangeVent) == last_state {
+				continue
+			}
 			last_state = newstate.(wsChangeVent)
 			cmdbytes := mkDamperCmdMsg(last_state)
 			if cmdbytes != nil && len(cmdbytes) > 0 {

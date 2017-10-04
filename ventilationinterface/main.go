@@ -18,17 +18,21 @@ var (
 
 const (
 	PS_DAMPERSCHANGED       = "damperschanged"
+	PS_DAMPERREQUEST        = "damperrequest"
+	PS_LOCKUPDATES          = "damperlocks"
 	PS_GETSTATEFORNEWCLIENT = "initalbytes"
 	PS_JSONTOALL            = "jsontoall"
 )
 
 var (
+	LocalAuthToken_        string
 	DebugFlags_            string
 	TeensyTTY_             string
 	MinVentChangeInterval_ time.Duration
 )
 
 func init() {
+	flag.StringVar(&LocalAuthToken_, "localtoken", "", "Token provided by website so we know its from the local touch display")
 	flag.StringVar(&DebugFlags_, "debug", "", "List of debug flags separated by , or ALL")
 	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "µC serial device")
 	flag.DurationVar(&MinVentChangeInterval_, "mininterval", 1500*time.Millisecond, "Min Invervall between sending cmds to µC")
