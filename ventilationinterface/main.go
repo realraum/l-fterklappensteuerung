@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/btittelbach/pubsub"
+	"github.com/realraum/door_and_sensors/r3events"
 )
 
 var (
@@ -22,6 +23,7 @@ const (
 	PS_LOCKUPDATES          = "damperlocks"
 	PS_GETSTATEFORNEWCLIENT = "initalbytes"
 	PS_JSONTOALL            = "jsontoall"
+	PS_SHUTDOWN             = "shutdown"
 )
 
 var (
@@ -29,13 +31,19 @@ var (
 	DebugFlags_            string
 	TeensyTTY_             string
 	MinVentChangeInterval_ time.Duration
+	MQTTBroker_            string
+	MQTTClientID_          string
+	LockTimeout_           time.Duration
 )
 
 func init() {
+	flag.StringVar(&MQTTBroker_, "mqttbroker", "tcp://mqtt.realraum.at:1883", "MQTT Broker")
+	flag.StringVar(&MQTTClientID_, "mqttclientid", r3events.CLIENTID_VENTILATION, "MQTT Client ID")
 	flag.StringVar(&LocalAuthToken_, "localtoken", "", "Token provided by website so we know its from the local touch display")
 	flag.StringVar(&DebugFlags_, "debug", "", "List of debug flags separated by , or ALL")
 	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "µC serial device")
 	flag.DurationVar(&MinVentChangeInterval_, "mininterval", 1500*time.Millisecond, "Min Invervall between sending cmds to µC")
+	flag.DurationVar(&LockTimeout_, "locktimeout", 20*time.Minute, "Timeout for OLGA/Lasercutter Lock")
 }
 
 func main() {
@@ -56,8 +64,9 @@ func MainThatReallyIsTheRealMain() {
 	defer ps.Pub(true, "shutdown")
 
 	go RunMartini(ps)
-	go goSanityCheckDamperRequests(ps)
+	go goSanityCheckDamperRequests(ps, LockTimeout_)
 	go goChangeDampers(ps, MinVentChangeInterval_)
+	go goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps)
 
 	// wait on Ctrl-C or sigInt or sigKill
 	func() {

@@ -14,6 +14,7 @@ var (
 	LogWS_     *log.Logger
 	LogVent_   *log.Logger
 	LogSerial_ *log.Logger
+	LogMQTT_   *log.Logger
 )
 
 func init() {
@@ -21,6 +22,7 @@ func init() {
 	LogWS_ = log.New(&NullWriter{}, "", 0)
 	LogVent_ = log.New(&NullWriter{}, "", 0)
 	LogSerial_ = log.New(&NullWriter{}, "", 0)
+	LogMQTT_ = log.New(&NullWriter{}, "", 0)
 }
 
 func LogEnable(logtypes ...string) {
@@ -34,11 +36,14 @@ func LogEnable(logtypes ...string) {
 			LogVent_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
 		case "SERIAL":
 			LogSerial_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
+		case "MQTT":
+			LogSerial_ = log.New(os.Stderr, logtype+" ", log.LstdFlags)
 		case "ALL":
 			LogMain_ = log.New(os.Stderr, "MAIN"+" ", log.LstdFlags)
 			LogWS_ = log.New(os.Stderr, "WS"+" ", log.LstdFlags)
 			LogVent_ = log.New(os.Stderr, "VENT"+" ", log.LstdFlags)
 			LogSerial_ = log.New(os.Stderr, "SERIAL"+" ", log.LstdFlags)
+			LogMQTT_ = log.New(os.Stderr, "MQTT"+" ", log.LstdFlags)
 		}
 	}
 }
