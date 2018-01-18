@@ -14,6 +14,8 @@ type mqttChangeVent struct {
 	Ts int64
 }
 
+const TIMEOUT_OFF_AFTER_EVERYBODY_LEFT = 2 * time.Minute
+
 //Connect and keep trying to connect to MQTT Broker
 //And while we cannot, still provide as much functionality as possible
 func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
@@ -28,14 +30,35 @@ func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
 					ps.Pub(lp.IsHot, PS_LOCKUPDATES)
 				}
 			})
-			SubscribeAndAttachCallback(mqttc, r3events.TOPIC_META_PRESENCE, func(c mqtt.Client, msg mqtt.Message) {
-				var lp r3events.PresenceUpdate
-				if err := json.Unmarshal(msg.Payload(), &lp); err == nil {
-					if lp.Present == false {
-						ps.Pub(DamperRequest{request: wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}, islocal: true, toclient_chan: nil}, PS_DAMPERREQUEST)
+			go func() {
+				shutdown_c := ps.SubOnce(PS_SHUTDOWN)
+				mqtt_presence_chan := SubscribeAndForwardToChannel(mqttc, r3events.TOPIC_META_PRESENCE)
+				off_after_presence_false_timeout := time.NewTimer(TIMEOUT_OFF_AFTER_EVERYBODY_LEFT)
+				if !off_after_presence_false_timeout.Stop() {
+					<-off_after_presence_false_timeout.C //in case TIMEOUT_OFF_AFTER_EVERYBODY_LEFT == 0
+				}
+				people_present := true
+
+				for {
+					select {
+					case msg := <-mqtt_presence_chan:
+						var lp r3events.PresenceUpdate
+						if err := json.Unmarshal(msg.Payload(), &lp); err == nil {
+							people_present = lp.Present
+							if people_present == false {
+								off_after_presence_false_timeout.Reset(TIMEOUT_OFF_AFTER_EVERYBODY_LEFT)
+							}
+						}
+					case <-off_after_presence_false_timeout.C:
+						if people_present == false {
+							ps.Pub(DamperRequest{request: wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}, islocal: true, toclient_chan: nil}, PS_DAMPERREQUEST)
+						}
+					case <-shutdown_c:
+						return
 					}
 				}
-			})
+			}()
+
 			go func() {
 				newstate_c := ps.Sub(PS_DAMPERSCHANGED)
 				shutdown_c := ps.SubOnce(PS_SHUTDOWN)

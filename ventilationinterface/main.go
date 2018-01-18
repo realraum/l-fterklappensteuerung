@@ -74,7 +74,7 @@ func MainThatReallyIsTheRealMain() {
 		signal.Notify(ctrlc_c, os.Interrupt, os.Kill, syscall.SIGTERM)
 		<-ctrlc_c //block until ctrl+c is pressed || we receive SIGINT aka kill -1 || kill
 		fmt.Println("SIGINT received, exiting gracefully ...")
-		ps.Pub(true, "shutdown")
+		ps.Pub(true, PS_SHUTDOWN)
 	}()
 
 }
