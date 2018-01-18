@@ -123,8 +123,19 @@ func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 				last_state = newreq.request
 				know_last_state = true
 			} else {
-				if know_last_state {
-					replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_ventchange, Data: last_state})
+				if newreq.toclient_chan != nil {
+					if know_last_state {
+						replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_ventchange, Data: last_state})
+						if err != nil {
+							LogWS_.Print(err)
+							continue
+						}
+						select { //make sure we don't crash or hang by writing to closed or blocked chan
+						case newreq.toclient_chan <- replydata:
+						default:
+						}
+					}
+					replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: *wserr})
 					if err != nil {
 						LogWS_.Print(err)
 						continue
@@ -133,15 +144,6 @@ func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 					case newreq.toclient_chan <- replydata:
 					default:
 					}
-				}
-				replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: *wserr})
-				if err != nil {
-					LogWS_.Print(err)
-					continue
-				}
-				select { //make sure we don't crash or hang by writing to closed or blocked chan
-				case newreq.toclient_chan <- replydata:
-				default:
 				}
 			}
 		}

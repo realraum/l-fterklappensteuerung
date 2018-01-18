@@ -32,7 +32,7 @@ func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
 				var lp r3events.PresenceUpdate
 				if err := json.Unmarshal(msg.Payload(), &lp); err == nil {
 					if lp.Present == false {
-						ps.Pub(wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}, PS_DAMPERSCHANGED)
+						ps.Pub(DamperRequest{request: wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}, islocal: true, toclient_chan: nil}, PS_DAMPERREQUEST)
 					}
 				}
 			})
