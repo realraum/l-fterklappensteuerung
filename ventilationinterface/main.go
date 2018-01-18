@@ -43,7 +43,7 @@ func init() {
 	flag.StringVar(&DebugFlags_, "debug", "", "List of debug flags separated by , or ALL")
 	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "µC serial device")
 	flag.DurationVar(&MinVentChangeInterval_, "mininterval", 1500*time.Millisecond, "Min Invervall between sending cmds to µC")
-	flag.DurationVar(&LockTimeout_, "locktimeout", 20*time.Minute, "Timeout for OLGA/Lasercutter Lock")
+	flag.DurationVar(&LockTimeout_, "locktimeout", 30*time.Minute, "Timeout for OLGA/Lasercutter Lock")
 }
 
 func main() {
