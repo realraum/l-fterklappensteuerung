@@ -14,8 +14,6 @@ type mqttChangeVent struct {
 	Ts int64
 }
 
-const TIMEOUT_OFF_AFTER_EVERYBODY_LEFT = 2 * time.Minute
-
 //Connect and keep trying to connect to MQTT Broker
 //And while we cannot, still provide as much functionality as possible
 func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
@@ -33,9 +31,9 @@ func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
 			go func() {
 				shutdown_c := ps.SubOnce(PS_SHUTDOWN)
 				mqtt_presence_chan := SubscribeAndForwardToChannel(mqttc, r3events.TOPIC_META_PRESENCE)
-				off_after_presence_false_timeout := time.NewTimer(TIMEOUT_OFF_AFTER_EVERYBODY_LEFT)
+				off_after_presence_false_timeout := time.NewTimer(OffAfterEverybodyLeftTimeout_)
 				if !off_after_presence_false_timeout.Stop() {
-					<-off_after_presence_false_timeout.C //in case TIMEOUT_OFF_AFTER_EVERYBODY_LEFT == 0
+					<-off_after_presence_false_timeout.C //in case OffAfterEverybodyLeftTimeout_ == 0
 				}
 				people_present := true
 
@@ -46,7 +44,7 @@ func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
 						if err := json.Unmarshal(msg.Payload(), &lp); err == nil {
 							people_present = lp.Present
 							if people_present == false {
-								off_after_presence_false_timeout.Reset(TIMEOUT_OFF_AFTER_EVERYBODY_LEFT)
+								off_after_presence_false_timeout.Reset(OffAfterEverybodyLeftTimeout_)
 							}
 						}
 					case <-off_after_presence_false_timeout.C:

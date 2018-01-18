@@ -27,13 +27,14 @@ const (
 )
 
 var (
-	LocalAuthToken_        string
-	DebugFlags_            string
-	TeensyTTY_             string
-	MinVentChangeInterval_ time.Duration
-	MQTTBroker_            string
-	MQTTClientID_          string
-	LockTimeout_           time.Duration
+	LocalAuthToken_               string
+	DebugFlags_                   string
+	TeensyTTY_                    string
+	MinVentChangeInterval_        time.Duration
+	MQTTBroker_                   string
+	MQTTClientID_                 string
+	LockTimeout_                  time.Duration
+	OffAfterEverybodyLeftTimeout_ time.Duration
 )
 
 func init() {
@@ -44,6 +45,7 @@ func init() {
 	flag.StringVar(&TeensyTTY_, "tty", "/dev/ttyACM0", "µC serial device")
 	flag.DurationVar(&MinVentChangeInterval_, "mininterval", 1500*time.Millisecond, "Min Invervall between sending cmds to µC")
 	flag.DurationVar(&LockTimeout_, "locktimeout", 30*time.Minute, "Timeout for OLGA/Lasercutter Lock")
+	flag.DurationVar(&OffAfterEverybodyLeftTimeout_, "autoofftimeout", 2*time.Minute, "Timeout for automatic Off after everybody left")
 }
 
 func main() {
