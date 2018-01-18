@@ -100,10 +100,14 @@ func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 			switch newlock := newlock_i.(type) {
 			case bool:
 				current_lock.LaserLock = newlock
-				locktimeouter.Reset(locktimeout)
+				if newlock {
+					locktimeouter.Reset(locktimeout)
+				}
 			case wsLock:
 				current_lock.OLGALock = newlock.OLGALock
-				locktimeouter.Reset(locktimeout)
+				if newlock.OLGALock {
+					locktimeouter.Reset(locktimeout)
+				}
 			default:
 			}
 		case <-locktimeouter.C:
