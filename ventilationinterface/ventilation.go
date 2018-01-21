@@ -83,13 +83,14 @@ func sanityCheckVentilationStateChange(prev_state, new_state *wsChangeVent, loca
 
 func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 	newreq_c := ps.Sub(PS_DAMPERREQUEST)
-	newlock_c := ps.Sub(PS_LOCKUPDATES)
+	newlock_c := ps.Sub(PS_LOCKCHREQ)
 	shutdown_c := ps.SubOnce("shutdown")
-	defer ps.Unsub(newlock_c, PS_LOCKUPDATES)
+	defer ps.Unsub(newlock_c, PS_LOCKCHREQ)
 	defer ps.Unsub(newreq_c, PS_DAMPERREQUEST)
 	var last_state wsChangeVent
 	var know_last_state bool = false
-	var current_lock wsLock
+	var OLGALock bool = false
+	var LaserLock bool = false
 	locktimeouter := time.NewTimer(0)
 
 	for {
@@ -98,33 +99,37 @@ func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 			return
 		case newlock_i := <-newlock_c:
 			switch newlock := newlock_i.(type) {
-			case bool:
-				current_lock.LaserLock = newlock
-				if newlock {
+			case wsLockChangeLaser:
+				LaserLock = newlock.LaserLock
+				if newlock.LaserLock {
 					locktimeouter.Reset(locktimeout)
 				}
-			case wsLock:
-				current_lock.OLGALock = newlock.OLGALock
+			case wsLockChangeOLGA:
+				OLGALock = newlock.OLGALock
 				if newlock.OLGALock {
 					locktimeouter.Reset(locktimeout)
 				}
 			default:
 			}
 		case <-locktimeouter.C:
-			current_lock.LaserLock = false
-			current_lock.OLGALock = false
-			ps.Pub(current_lock, PS_LOCKUPDATES)
+			LaserLock = false
+			OLGALock = false
+			last_state.OLGALock = OLGALock
+			last_state.LaserLock = LaserLock
+			ps.Pub(last_state, PS_DAMPERSCHANGED)
 		case newreq_i := <-newreq_c:
 			var wserr *wsError = nil
 
 			newreq := newreq_i.(DamperRequest)
 			LogVent_.Print("CmdFromWeb:", newreq)
 			if know_last_state {
-				wserr = sanityCheckVentilationStateChange(&last_state, &newreq.request, newreq.islocal, current_lock.LaserLock, current_lock.OLGALock)
+				wserr = sanityCheckVentilationStateChange(&last_state, &newreq.request, newreq.islocal, LaserLock, OLGALock)
 			}
 			if wserr == nil {
-				ps.Pub(newreq.request, PS_DAMPERSCHANGED)
 				last_state = newreq.request
+				last_state.OLGALock = OLGALock
+				last_state.LaserLock = LaserLock
+				ps.Pub(last_state, PS_DAMPERSCHANGED)
 				know_last_state = true
 			} else {
 				if newreq.toclient_chan != nil {

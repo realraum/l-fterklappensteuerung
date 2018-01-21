@@ -6,7 +6,11 @@ var webSocketSupport = null;
 
 var wsctx_ventchange = "ventchange";
 var wsctx_error = "error";
-var wsctx_lock = "lock";
+var ws_ctx_lock       = "lock";
+var ws_ctx_lock_laser = "locklaser";
+var ws_ctx_lock_olga  = "lockolga";
+
+var auth_token_param_name_ = "authtoken";
 
 function handleExternalControlStateChange(data) {
 	$(".controlstate").removeClass("active");
@@ -49,6 +53,25 @@ function ShowConnectionEstablished() {
 	$("div.waitingoverlay").css("display","none");
 }
 
+function handleLockStateChange(data) {
+	//TODO
+}
+
+
+function getLocationURLParameter(queryparam) {
+	var urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.has(queryparam))
+		return urlParams.get(queryparam);
+	else
+		return "";
+}
+
+function sendOLGALockUpdate() {
+	var newstate=$(".olgalock").hasClass("active");
+	var local_auth_token=getLocationURLParameter(auth_token_param_name_);
+	ws.send(wsctx_ventchange, {"olga":newstate,"autotoken":local_auth_token});
+}
+
 (function() {
   webSocketSupport = hasWebSocketSupport();
 
@@ -58,6 +81,7 @@ function ShowConnectionEstablished() {
 
     ws.registerContext(wsctx_ventchange,handleExternalControlStateChange);
     ws.registerContext(wsctx_error,handleErrorMsg);
+    ws.registerContext(ws_ctx_lock,handleLockStateChange);
     ws.onopen = ShowConnectionEstablished;
     ws.ondisconnect = ShowWaitingForConnection;
     ws.open(webSocketUrl);

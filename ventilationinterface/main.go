@@ -20,7 +20,7 @@ var (
 const (
 	PS_DAMPERSCHANGED       = "damperschanged"
 	PS_DAMPERREQUEST        = "damperrequest"
-	PS_LOCKUPDATES          = "damperlocks"
+	PS_LOCKCHREQ            = "lockchangerequest"
 	PS_GETSTATEFORNEWCLIENT = "initalbytes"
 	PS_JSONTOALL            = "jsontoall"
 	PS_SHUTDOWN             = "shutdown"

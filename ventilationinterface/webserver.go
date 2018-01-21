@@ -15,7 +15,8 @@ const (
 	ws_ctx_ventchange      = "ventchange"
 	ws_ctx_login           = "login"
 	ws_ctx_error           = "error"
-	ws_ctx_lock            = "lock"
+	ws_ctx_lock_laser      = "locklaser"
+	ws_ctx_lock_olga       = "lockolga"
 	ws_error_none          = "none"             //info msg only not an error
 	ws_error_prohibited    = "prohibited"       //requested dangerous or generally prohibited state
 	ws_error_notauth       = "notauthenticated" //state that can only be activated with local auth token
@@ -45,16 +46,23 @@ type wsError struct {
 	Msg  string `json:"msg"`
 }
 
-type wsLock struct {
-	OLGALock  bool `json:"olga"`
-	LaserLock bool `json:"laser"`
+type wsLockChangeLaser struct {
+	LaserLock bool   `json:"laser"`
+	AuthToken string `json:"authtoken"`
+}
+
+type wsLockChangeOLGA struct {
+	OLGALock  bool   `json:"olga"`
+	AuthToken string `json:"authtoken"`
 }
 
 type wsChangeVent struct {
-	Damper1 string
-	Damper2 string
-	Damper3 string
-	Fan     string
+	Damper1   string
+	Damper2   string
+	Damper3   string
+	Fan       string
+	OLGALock  bool
+	LaserLock bool
 }
 
 const (
@@ -161,7 +169,7 @@ func goTalkWithClient(w http.ResponseWriter, r *http.Request, ps *pubsub.PubSub)
 	// the PongHandler will set the read deadline for next messages if pings arrive
 	ws.SetPongHandler(func(string) error { ws.SetReadDeadline(time.Now().Add(ws_read_timeout_)); return nil })
 
-	client_is_local := false
+	client_is_local := ws.RemoteAddr().String() == "127.0.0.1"
 
 WSREADLOOP:
 	for {
@@ -187,31 +195,17 @@ WSREADLOOP:
 			} else {
 				LogWS_.Println("Invalid Data received", data)
 			}
-		case ws_ctx_login:
-			var data wsLogin
+		case ws_ctx_lock_olga:
+			var data wsLockChangeOLGA
 			err = mapstructure.Decode(v.Data, &data)
 			if err != nil {
 				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
 				continue WSREADLOOP
 			}
-			if data.Token == LocalAuthToken_ {
-				client_is_local = true
-				replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: wsError{Type: ws_error_none, Msg: "Welcome local client"}})
-				if err != nil {
-					LogWS_.Print(err)
-					continue WSREADLOOP
-				}
-				toclient_chan <- replydata
+			if (len(LocalAuthToken_) > 0 && data.AuthToken == LocalAuthToken_) || client_is_local {
+				//only forward request if from localhost or with valid authtoken
+				ps.Pub(data, PS_LOCKCHREQ)
 			}
-		case ws_ctx_lock:
-			var data wsLock
-			err = mapstructure.Decode(v.Data, &data)
-			if err != nil {
-				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
-				continue WSREADLOOP
-			}
-			data.LaserLock = false //can't set laserlock via web, only via mqtt
-			ps.Pub(data, PS_LOCKUPDATES)
 		}
 	}
 }
