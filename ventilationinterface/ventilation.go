@@ -87,7 +87,7 @@ func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 	shutdown_c := ps.SubOnce("shutdown")
 	defer ps.Unsub(newlock_c, PS_LOCKCHREQ)
 	defer ps.Unsub(newreq_c, PS_DAMPERREQUEST)
-	var last_state wsChangeVent
+	var last_state wsChangeVent = wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}
 	var know_last_state bool = false
 	var OLGALock bool = false
 	var LaserLock bool = false
