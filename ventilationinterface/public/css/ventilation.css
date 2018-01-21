@@ -23,7 +23,7 @@ body {
 	margin-top:0.2vh;
  }
 
- .controlgroupvertical {
+ .controlgroupvertical, .lockgroupvertical{
 	vertical-align: top;
 	width:94vw;
 	display:inline-block;
@@ -51,7 +51,7 @@ body {
 	color:white;
  }
 
-.controlstate {
+.controlstate, .lockbutton {
 	padding-top:4vh;
 	padding-bottom:4vh;
 	padding-left:1vw;
@@ -82,6 +82,10 @@ body {
 
 .controlstate.active {
 	background:lime;
+}
+
+.lockbutton.active {
+	background:red;
 }
 
 #loading-img {
