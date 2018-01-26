@@ -52,7 +52,7 @@ func sanityCheckVentilationStateChange(prev_state, new_state *wsChangeVent, loca
 	if starting_fan && all_dampers_closed {
 		return &wsError{Type: ws_error_prohibited, Msg: "Won't start Fan with dampers closed!"}
 	}
-	if new_state.Fan == ws_fan_state_on && all_dampers_opened && !local_request {
+	if new_state.Fan == ws_fan_state_on && all_dampers_opened { //&& !local_request {
 		return &wsError{Type: ws_error_notauth, Msg: "Please open only 2 dampers at a time"}
 	}
 	if lasercutter_in_use {
@@ -67,7 +67,7 @@ func sanityCheckVentilationStateChange(prev_state, new_state *wsChangeVent, loca
 		}
 	}
 	if olga_locked && !local_request {
-		if new_state.Fan == ws_fan_state_off {
+		if stopping_fan && (prev_state.Damper2 == ws_damper_state_open || prev_state.Damper3 == ws_damper_state_open) {
 			return &wsError{Type: ws_error_notauth, Msg: "Can't stop fan while OLGA locked it"}
 		}
 		if closing_damper2 || closing_damper3 || opening_damper1 {
