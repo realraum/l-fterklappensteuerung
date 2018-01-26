@@ -84,8 +84,8 @@ func goChangeDampers(ps *pubsub.PubSub, min_cmd_send_interval time.Duration) {
 		case <-shutdown_c:
 			return
 		case newstate := <-newstate_c:
-			LogVent_.Print("CmdFromWeb:", newstate.(wsChangeVent))
 			vent_position_changed := didVentPositionChange(last_state, newstate.(wsChangeVent))
+			LogVent_.Print("goChangeDampers", "Changing Ventpositions to:", newstate.(wsChangeVent))
 			if newstate.(wsChangeVent) == last_state {
 				continue
 			}
@@ -93,15 +93,15 @@ func goChangeDampers(ps *pubsub.PubSub, min_cmd_send_interval time.Duration) {
 			cmdbytes := mkDamperCmdMsg(last_state)
 			if cmdbytes != nil && len(cmdbytes) > 0 {
 				if vent_position_changed && time.Now().Sub(last_cmd_time) < min_cmd_send_interval {
-					LogVent_.Print("cmds too fast, delaying..", cmdbytes)
+					LogVent_.Print("goChangeDampers", "cmds too fast, delaying..", cmdbytes)
 					time.Sleep(min_cmd_send_interval - time.Now().Sub(last_cmd_time))
 				}
-				LogVent_.Print("ToPJON:", cmdbytes)
+				LogVent_.Print("goChangeDampers", "ToPJON:", cmdbytes)
 				teensytty_wr <- cmdbytes
 				last_cmd_time = time.Now()
 			}
 		case line := <-teensytty_rd:
-			LogVent_.Print("FromPJON:", line)
+			LogVent_.Print("goChangeDampers", "FromPJON:", line)
 		}
 	}
 }

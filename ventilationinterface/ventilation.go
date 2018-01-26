@@ -10,7 +10,7 @@ import (
 type DamperRequest struct {
 	islocal       bool
 	toclient_chan chan []byte
-	request       wsChangeVent
+	request       interface{}
 }
 
 func sanityCheckRequestedVentilationState(state *wsChangeVent) bool {
@@ -83,76 +83,81 @@ func sanityCheckVentilationStateChange(prev_state, new_state *wsChangeVent, loca
 
 func goSanityCheckDamperRequests(ps *pubsub.PubSub, locktimeout time.Duration) {
 	newreq_c := ps.Sub(PS_DAMPERREQUEST)
-	newlock_c := ps.Sub(PS_LOCKCHREQ)
 	shutdown_c := ps.SubOnce("shutdown")
-	defer ps.Unsub(newlock_c, PS_LOCKCHREQ)
 	defer ps.Unsub(newreq_c, PS_DAMPERREQUEST)
 	var last_state wsChangeVent = wsChangeVent{Damper1: ws_damper_state_closed, Damper2: ws_damper_state_closed, Damper3: ws_damper_state_closed, Fan: ws_fan_state_off}
-	var know_last_state bool = false
 	var OLGALock bool = false
 	var LaserLock bool = false
 	locktimeouter := time.NewTimer(0)
+	publishDamperUpdate := func() {
+		last_state.OLGALock = OLGALock
+		last_state.LaserLock = LaserLock
+		LogVent_.Println("pub last_state:", last_state)
+		ps.Pub(last_state, PS_DAMPERSCHANGED)
+	}
+	replyToWebClient := func(toclient_chan chan<- []byte, wserr *wsError) {
+		if toclient_chan != nil {
+			replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_ventchange, Data: last_state})
+			if err != nil {
+				LogWS_.Print(err)
+				return
+			}
+			select { //make sure we don't crash or hang by writing to closed or blocked chan
+			case toclient_chan <- replydata:
+			default:
+			}
+			replydata, err = json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: *wserr})
+			if err != nil {
+				LogWS_.Print(err)
+				return
+			}
+			select { //make sure we don't crash or hang by writing to closed or blocked chan
+			case toclient_chan <- replydata:
+			default:
+			}
+		}
+	}
 
 	for {
 		select {
 		case <-shutdown_c:
 			return
-		case newlock_i := <-newlock_c:
-			switch newlock := newlock_i.(type) {
-			case wsLockChangeLaser:
-				LaserLock = newlock.LaserLock
-				if newlock.LaserLock {
-					locktimeouter.Reset(locktimeout)
-				}
-			case wsLockChangeOLGA:
-				OLGALock = newlock.OLGALock
-				if newlock.OLGALock {
-					locktimeouter.Reset(locktimeout)
-				}
-			default:
-			}
 		case <-locktimeouter.C:
 			LaserLock = false
 			OLGALock = false
-			last_state.OLGALock = OLGALock
-			last_state.LaserLock = LaserLock
-			ps.Pub(last_state, PS_DAMPERSCHANGED)
+			publishDamperUpdate()
 		case newreq_i := <-newreq_c:
 			var wserr *wsError = nil
-
 			newreq := newreq_i.(DamperRequest)
-			LogVent_.Print("CmdFromWeb:", newreq)
-			if know_last_state {
-				wserr = sanityCheckVentilationStateChange(&last_state, &newreq.request, newreq.islocal, LaserLock, OLGALock)
-			}
-			if wserr == nil {
-				last_state = newreq.request
-				last_state.OLGALock = OLGALock
-				last_state.LaserLock = LaserLock
-				ps.Pub(last_state, PS_DAMPERSCHANGED)
-				know_last_state = true
-			} else {
-				if newreq.toclient_chan != nil {
-					if know_last_state {
-						replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_ventchange, Data: last_state})
-						if err != nil {
-							LogWS_.Print(err)
-							continue
-						}
-						select { //make sure we don't crash or hang by writing to closed or blocked chan
-						case newreq.toclient_chan <- replydata:
-						default:
-						}
-					}
-					replydata, err := json.Marshal(wsMessageOut{Ctx: ws_ctx_error, Data: *wserr})
-					if err != nil {
-						LogWS_.Print(err)
-						continue
-					}
-					select { //make sure we don't crash or hang by writing to closed or blocked chan
-					case newreq.toclient_chan <- replydata:
-					default:
-					}
+			LogVent_.Print("goSanityCheckDamperRequests:newreq:", newreq)
+			switch statereq := (newreq.request).(type) {
+			case wsChangeVent:
+				wserr = sanityCheckVentilationStateChange(&last_state, &statereq, newreq.islocal, LaserLock, OLGALock)
+				if wserr == nil {
+					last_state = statereq
+					publishDamperUpdate()
+				} else {
+					replyToWebClient(newreq.toclient_chan, wserr)
+				}
+			case wsLockChangeLaser:
+				if !newreq.islocal {
+					replyToWebClient(newreq.toclient_chan, &wsError{Type: ws_error_prohibited, Msg: "Lock can only be changed with LaserCard"})
+					continue
+				}
+				LaserLock = statereq.LaserLock
+				publishDamperUpdate()
+				if statereq.LaserLock {
+					locktimeouter.Reset(locktimeout)
+				}
+			case wsLockChangeOLGA:
+				if !newreq.islocal {
+					replyToWebClient(newreq.toclient_chan, &wsError{Type: ws_error_prohibited, Msg: "Not Authorized to change OLGA-Lock"})
+					continue
+				}
+				OLGALock = statereq.OLGALock
+				publishDamperUpdate()
+				if statereq.OLGALock {
+					locktimeouter.Reset(locktimeout)
 				}
 			}
 		}

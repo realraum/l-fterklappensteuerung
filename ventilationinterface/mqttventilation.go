@@ -25,7 +25,7 @@ func goConnectToMQTTBrokerAndFunctionWithoutInTheMeantime(ps *pubsub.PubSub) {
 			SubscribeAndAttachCallback(mqttc, r3events.TOPIC_LASER_CARD, func(c mqtt.Client, msg mqtt.Message) {
 				var lp r3events.LaserCutter
 				if err := json.Unmarshal(msg.Payload(), &lp); err == nil {
-					ps.Pub(wsLockChangeLaser{LaserLock: lp.IsHot, AuthToken: LocalAuthToken_}, PS_LOCKCHREQ)
+					ps.Pub(DamperRequest{request: wsLockChangeLaser{LaserLock: lp.IsHot, AuthToken: ""}, islocal: true, toclient_chan: nil}, PS_DAMPERREQUEST)
 				}
 			})
 			go func() {

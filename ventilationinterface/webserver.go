@@ -47,13 +47,13 @@ type wsError struct {
 }
 
 type wsLockChangeLaser struct {
-	LaserLock bool   `json:"laser"`
-	AuthToken string `json:"authtoken"`
+	LaserLock bool   `json:"laser" mapstructure:"laser"`
+	AuthToken string `json:"authtoken" mapstructure:"authtoken"`
 }
 
 type wsLockChangeOLGA struct {
-	OLGALock  bool   `json:"olga"`
-	AuthToken string `json:"authtoken"`
+	OLGALock  bool   `json:"olga" mapstructure:"olga"`
+	AuthToken string `json:"authtoken" mapstructure:"authtoken"`
 }
 
 type wsChangeVent struct {
@@ -169,7 +169,7 @@ func goTalkWithClient(w http.ResponseWriter, r *http.Request, ps *pubsub.PubSub)
 	// the PongHandler will set the read deadline for next messages if pings arrive
 	ws.SetPongHandler(func(string) error { ws.SetReadDeadline(time.Now().Add(ws_read_timeout_)); return nil })
 
-	client_is_local := ws.RemoteAddr().String() == "127.0.0.1"
+	client_is_local := ws.RemoteAddr().String()[0:9] == "127.0.0.1"
 
 WSREADLOOP:
 	for {
@@ -202,10 +202,9 @@ WSREADLOOP:
 				LogWS_.Printf("%s Data decode error: %s", v.Ctx, err)
 				continue WSREADLOOP
 			}
-			if (len(LocalAuthToken_) > 0 && data.AuthToken == LocalAuthToken_) || client_is_local {
-				//only forward request if from localhost or with valid authtoken
-				ps.Pub(data, PS_LOCKCHREQ)
-			}
+			authorized_to_change_lock := client_is_local || (len(LocalAuthToken_) > 0 && data.AuthToken == LocalAuthToken_)
+			data.AuthToken = ""
+			ps.Pub(DamperRequest{request: data, islocal: authorized_to_change_lock, toclient_chan: toclient_chan}, PS_DAMPERREQUEST)
 		}
 	}
 }

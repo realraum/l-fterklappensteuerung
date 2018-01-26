@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
@@ -20,7 +21,6 @@ var (
 const (
 	PS_DAMPERSCHANGED       = "damperschanged"
 	PS_DAMPERREQUEST        = "damperrequest"
-	PS_LOCKCHREQ            = "lockchangerequest"
 	PS_GETSTATEFORNEWCLIENT = "initalbytes"
 	PS_JSONTOALL            = "jsontoall"
 	PS_SHUTDOWN             = "shutdown"
@@ -38,6 +38,7 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	flag.StringVar(&MQTTBroker_, "mqttbroker", "tcp://mqtt.realraum.at:1883", "MQTT Broker")
 	flag.StringVar(&MQTTClientID_, "mqttclientid", r3events.CLIENTID_VENTILATION, "MQTT Client ID")
 	flag.StringVar(&LocalAuthToken_, "localtoken", "", "Token provided by website so we know its from the local touch display")
