@@ -1,35 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
+EESchema Schematic File Version 4
 LIBS:lüfterklappenelektronik-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -44,18 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L ATMEGA32U4-A U105
-U 1 1 57419906
-P 5350 3550
-F 0 "U105" H 5325 5618 50  0000 C CNN
-F 1 "ATMEGA32U4-A" H 5325 5527 50  0000 C CNN
-F 2 "ArduinoTeensyFootprints:ArduProMicro" H 5325 5436 50  0000 C CIN
-F 3 "" H 6450 4650 50  0000 C CNN
-	1    5350 3550
-	1    0    0    -1  
-$EndComp
-$Comp
-L VR VR101
+L lüfterklappenelektronik-rescue:VR VR101
 U 1 1 5741999A
 P 5850 6700
 F 0 "VR101" H 5938 6746 50  0000 L CNN
@@ -66,7 +26,7 @@ F 3 "" H 5850 6700 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L S102S02 U104
+L lüfterklappenelektronik-rescue:S102S02 U104
 U 1 1 574199D4
 P 4900 6500
 F 0 "U104" H 4900 6915 50  0000 C CNN
@@ -77,7 +37,7 @@ F 3 "" H 4865 6500 50  0000 L CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R108
+L lüfterklappenelektronik-rescue:R R108
 U 1 1 57419A18
 P 5450 6550
 F 0 "R108" H 5520 6596 50  0000 L CNN
@@ -88,7 +48,7 @@ F 3 "" H 5450 6550 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C101
+L lüfterklappenelektronik-rescue:C C101
 U 1 1 57419A4E
 P 5450 6850
 F 0 "C101" H 5565 6896 50  0000 L CNN
@@ -99,7 +59,7 @@ F 3 "" H 5450 6850 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L D_Schottky D101
+L lüfterklappenelektronik-rescue:D_Schottky D101
 U 1 1 57419AAE
 P 8600 1400
 F 0 "D101" V 8554 1479 50  0000 L CNN
@@ -110,7 +70,7 @@ F 3 "" H 8600 1400 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L CONN_01X02 P106
+L lüfterklappenelektronik-rescue:CONN_01X02 P106
 U 1 1 57419C9B
 P 9350 1400
 F 0 "P106" H 9427 1441 50  0000 L CNN
@@ -121,7 +81,7 @@ F 3 "" H 9350 1400 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR01
+L power:+12V #PWR01
 U 1 1 57419EB1
 P 9150 1200
 F 0 "#PWR01" H 9150 1050 50  0001 C CNN
@@ -132,17 +92,17 @@ F 3 "" H 9150 1200 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9150 1200 9150 1350
+	9150 1200 9150 1250
 Wire Wire Line
 	8600 1250 9150 1250
 Connection ~ 9150 1250
 Wire Wire Line
 	8600 1550 9150 1550
 Wire Wire Line
-	9150 1450 9150 1650
+	9150 1450 9150 1550
 Connection ~ 9150 1550
 $Comp
-L R R109
+L lüfterklappenelektronik-rescue:R R109
 U 1 1 57419FFE
 P 8650 1900
 F 0 "R109" V 8443 1900 50  0000 C CNN
@@ -155,7 +115,7 @@ $EndComp
 Wire Wire Line
 	8800 1900 8850 1900
 $Comp
-L GND #PWR02
+L power:GND #PWR02
 U 1 1 5741A055
 P 9150 2200
 F 0 "#PWR02" H 9150 1950 50  0001 C CNN
@@ -172,7 +132,7 @@ Damper1
 Wire Wire Line
 	8400 1900 8500 1900
 $Comp
-L D_Schottky D102
+L lüfterklappenelektronik-rescue:D_Schottky D102
 U 1 1 5741A87E
 P 8600 3050
 F 0 "D102" V 8554 3129 50  0000 L CNN
@@ -183,7 +143,7 @@ F 3 "" H 8600 3050 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L CONN_01X02 P107
+L lüfterklappenelektronik-rescue:CONN_01X02 P107
 U 1 1 5741A884
 P 9350 3050
 F 0 "P107" H 9427 3091 50  0000 L CNN
@@ -194,7 +154,7 @@ F 3 "" H 9350 3050 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR03
+L power:+12V #PWR03
 U 1 1 5741A88A
 P 9150 2850
 F 0 "#PWR03" H 9150 2700 50  0001 C CNN
@@ -205,17 +165,17 @@ F 3 "" H 9150 2850 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9150 2850 9150 3000
+	9150 2850 9150 2900
 Wire Wire Line
 	8600 2900 9150 2900
 Connection ~ 9150 2900
 Wire Wire Line
 	8600 3200 9150 3200
 Wire Wire Line
-	9150 3100 9150 3300
+	9150 3100 9150 3200
 Connection ~ 9150 3200
 $Comp
-L R R110
+L lüfterklappenelektronik-rescue:R R110
 U 1 1 5741A896
 P 8650 3550
 F 0 "R110" V 8443 3550 50  0000 C CNN
@@ -228,7 +188,7 @@ $EndComp
 Wire Wire Line
 	8800 3550 8850 3550
 $Comp
-L GND #PWR04
+L power:GND #PWR04
 U 1 1 5741A89D
 P 9150 3850
 F 0 "#PWR04" H 9150 3600 50  0001 C CNN
@@ -245,7 +205,7 @@ Damper2
 Wire Wire Line
 	8400 3550 8500 3550
 $Comp
-L D_Schottky D103
+L lüfterklappenelektronik-rescue:D_Schottky D103
 U 1 1 5741AA2C
 P 8600 4700
 F 0 "D103" V 8554 4779 50  0000 L CNN
@@ -256,7 +216,7 @@ F 3 "" H 8600 4700 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L CONN_01X02 P108
+L lüfterklappenelektronik-rescue:CONN_01X02 P108
 U 1 1 5741AA32
 P 9350 4700
 F 0 "P108" H 9427 4741 50  0000 L CNN
@@ -267,7 +227,7 @@ F 3 "" H 9350 4700 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR05
+L power:+12V #PWR05
 U 1 1 5741AA38
 P 9150 4500
 F 0 "#PWR05" H 9150 4350 50  0001 C CNN
@@ -278,17 +238,17 @@ F 3 "" H 9150 4500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9150 4500 9150 4650
+	9150 4500 9150 4550
 Wire Wire Line
 	8600 4550 9150 4550
 Connection ~ 9150 4550
 Wire Wire Line
 	8600 4850 9150 4850
 Wire Wire Line
-	9150 4750 9150 4950
+	9150 4750 9150 4850
 Connection ~ 9150 4850
 $Comp
-L R R111
+L lüfterklappenelektronik-rescue:R R111
 U 1 1 5741AA44
 P 8650 5200
 F 0 "R111" V 8443 5200 50  0000 C CNN
@@ -301,7 +261,7 @@ $EndComp
 Wire Wire Line
 	8800 5200 8850 5200
 $Comp
-L GND #PWR06
+L power:GND #PWR06
 U 1 1 5741AA4B
 P 9150 5500
 F 0 "#PWR06" H 9150 5250 50  0001 C CNN
@@ -318,7 +278,7 @@ Damper3
 Wire Wire Line
 	8400 5200 8500 5200
 $Comp
-L +5V #PWR07
+L power:+5V #PWR07
 U 1 1 5741B188
 P 4450 6400
 F 0 "#PWR07" H 4450 6250 50  0001 C CNN
@@ -337,7 +297,7 @@ FAN
 Wire Wire Line
 	4200 6950 4600 6950
 $Comp
-L R R107
+L lüfterklappenelektronik-rescue:R R107
 U 1 1 5741B6FB
 P 4050 6950
 F 0 "R107" V 3843 6950 50  0000 C CNN
@@ -350,13 +310,13 @@ $EndComp
 Wire Wire Line
 	3800 6950 3900 6950
 Wire Wire Line
-	5200 6400 6200 6400
+	5200 6400 5450 6400
 Connection ~ 5450 6400
 Wire Wire Line
 	5200 7000 5200 6600
 Connection ~ 5450 7000
 $Comp
-L CONN_01X02 P102
+L lüfterklappenelektronik-rescue:CONN_01X02 P102
 U 1 1 5741BBF0
 P 6400 6450
 F 0 "P102" H 6477 6491 50  0000 L CNN
@@ -367,22 +327,22 @@ F 3 "" H 6400 6450 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PHOTORESISTOR U101
+L lüfterklappenelektronik-rescue:PHOTORESISTOR U101
 U 1 1 5741C0A5
 P 1750 1700
 F 0 "U101" H 1750 2125 50  0000 C CNN
-F 1 "Gabellichtschranke" H 1750 2034 50  0000 C CNN
+F 1 "#Gabellichtschranke" H 1750 2034 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 1700 50  0000 C CNN
 F 3 "" H 1750 1700 50  0000 C CNN
 	1    1750 1700
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R101
+L lüfterklappenelektronik-rescue:R R101
 U 1 1 5741C2C0
 P 1150 1200
 F 0 "R101" H 1220 1246 50  0000 L CNN
-F 1 "120" H 1220 1155 50  0000 L CNN
+F 1 "#120" H 1220 1155 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 1080 1200 50  0001 C CNN
 F 3 "" H 1150 1200 50  0000 C CNN
 	1    1150 1200
@@ -391,7 +351,7 @@ $EndComp
 Wire Wire Line
 	1150 1350 1150 1500
 $Comp
-L +5V #PWR08
+L power:+5V #PWR08
 U 1 1 5741C7BF
 P 1150 950
 F 0 "#PWR08" H 1150 800 50  0001 C CNN
@@ -404,7 +364,7 @@ $EndComp
 Wire Wire Line
 	1150 950  1150 1050
 $Comp
-L GND #PWR09
+L power:GND #PWR09
 U 1 1 5741CAC0
 P 1150 2050
 F 0 "#PWR09" H 1150 1800 50  0001 C CNN
@@ -417,18 +377,18 @@ $EndComp
 Wire Wire Line
 	1150 2050 1150 1900
 $Comp
-L R R104
+L lüfterklappenelektronik-rescue:R R104
 U 1 1 5741CC61
 P 2350 2050
 F 0 "R104" H 2420 2096 50  0000 L CNN
-F 1 "2K2" H 2420 2005 50  0000 L CNN
+F 1 "#2K2" H 2420 2005 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 2280 2050 50  0001 C CNN
 F 3 "" H 2350 2050 50  0000 C CNN
 	1    2350 2050
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR010
+L power:GND #PWR010
 U 1 1 5741CD13
 P 2350 2200
 F 0 "#PWR010" H 2350 1950 50  0001 C CNN
@@ -443,22 +403,22 @@ EndstopDamper1
 Wire Wire Line
 	2500 1500 2350 1500
 $Comp
-L PHOTORESISTOR U102
+L lüfterklappenelektronik-rescue:PHOTORESISTOR U102
 U 1 1 5741D5DE
 P 1750 3450
 F 0 "U102" H 1750 3875 50  0000 C CNN
-F 1 "Gabellichtschranke" H 1750 3784 50  0000 C CNN
+F 1 "#Gabellichtschranke" H 1750 3784 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 3450 50  0000 C CNN
 F 3 "" H 1750 3450 50  0000 C CNN
 	1    1750 3450
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R102
+L lüfterklappenelektronik-rescue:R R102
 U 1 1 5741D5E4
 P 1150 2950
 F 0 "R102" H 1220 2996 50  0000 L CNN
-F 1 "120" H 1220 2905 50  0000 L CNN
+F 1 "#120" H 1220 2905 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 1080 2950 50  0001 C CNN
 F 3 "" H 1150 2950 50  0000 C CNN
 	1    1150 2950
@@ -467,7 +427,7 @@ $EndComp
 Wire Wire Line
 	1150 3100 1150 3250
 $Comp
-L +5V #PWR011
+L power:+5V #PWR011
 U 1 1 5741D5EB
 P 1150 2700
 F 0 "#PWR011" H 1150 2550 50  0001 C CNN
@@ -480,7 +440,7 @@ $EndComp
 Wire Wire Line
 	1150 2700 1150 2800
 $Comp
-L GND #PWR012
+L power:GND #PWR012
 U 1 1 5741D5F2
 P 1150 3800
 F 0 "#PWR012" H 1150 3550 50  0001 C CNN
@@ -493,18 +453,18 @@ $EndComp
 Wire Wire Line
 	1150 3800 1150 3650
 $Comp
-L R R105
+L lüfterklappenelektronik-rescue:R R105
 U 1 1 5741D5F9
 P 2350 3800
 F 0 "R105" H 2420 3846 50  0000 L CNN
-F 1 "2K2" H 2420 3755 50  0000 L CNN
+F 1 "#2K2" H 2420 3755 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 2280 3800 50  0001 C CNN
 F 3 "" H 2350 3800 50  0000 C CNN
 	1    2350 3800
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR013
+L power:GND #PWR013
 U 1 1 5741D5FF
 P 2350 3950
 F 0 "#PWR013" H 2350 3700 50  0001 C CNN
@@ -519,22 +479,22 @@ EndstopDamper2
 Wire Wire Line
 	2500 3250 2350 3250
 $Comp
-L PHOTORESISTOR U103
+L lüfterklappenelektronik-rescue:PHOTORESISTOR U103
 U 1 1 5741D70C
 P 1750 5100
 F 0 "U103" H 1750 5525 50  0000 C CNN
-F 1 "Gabellichtschranke" H 1750 5434 50  0000 C CNN
+F 1 "#Gabellichtschranke" H 1750 5434 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 5100 50  0000 C CNN
 F 3 "" H 1750 5100 50  0000 C CNN
 	1    1750 5100
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R103
+L lüfterklappenelektronik-rescue:R R103
 U 1 1 5741D712
 P 1150 4600
 F 0 "R103" H 1220 4646 50  0000 L CNN
-F 1 "120" H 1220 4555 50  0000 L CNN
+F 1 "#120" H 1220 4555 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 1080 4600 50  0001 C CNN
 F 3 "" H 1150 4600 50  0000 C CNN
 	1    1150 4600
@@ -543,7 +503,7 @@ $EndComp
 Wire Wire Line
 	1150 4750 1150 4900
 $Comp
-L +5V #PWR014
+L power:+5V #PWR014
 U 1 1 5741D719
 P 1150 4350
 F 0 "#PWR014" H 1150 4200 50  0001 C CNN
@@ -556,7 +516,7 @@ $EndComp
 Wire Wire Line
 	1150 4350 1150 4450
 $Comp
-L GND #PWR015
+L power:GND #PWR015
 U 1 1 5741D720
 P 1150 5450
 F 0 "#PWR015" H 1150 5200 50  0001 C CNN
@@ -569,18 +529,18 @@ $EndComp
 Wire Wire Line
 	1150 5450 1150 5300
 $Comp
-L R R106
+L lüfterklappenelektronik-rescue:R R106
 U 1 1 5741D727
 P 2350 5450
 F 0 "R106" H 2420 5496 50  0000 L CNN
-F 1 "2K2" H 2420 5405 50  0000 L CNN
+F 1 "#2K2" H 2420 5405 50  0000 L CNN
 F 2 "Resistors_ThroughHole:Resistor_Horizontal_RM7mm" V 2280 5450 50  0001 C CNN
 F 3 "" H 2350 5450 50  0000 C CNN
 	1    2350 5450
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR016
+L power:GND #PWR016
 U 1 1 5741D72D
 P 2350 5600
 F 0 "#PWR016" H 2350 5350 50  0001 C CNN
@@ -595,48 +555,43 @@ EndstopDamper3
 Wire Wire Line
 	2500 4900 2350 4900
 Wire Wire Line
-	6450 2300 6750 2300
+	6450 2100 6550 2100
 Wire Wire Line
-	6450 2100 6750 2100
-Wire Wire Line
-	6450 2200 6750 2200
+	6450 2200 6600 2200
 Text Label 6750 2000 2    60   ~ 0
 PS1SS
 Text Label 7200 1400 3    60   ~ 0
 PS2SS
 Wire Wire Line
-	6550 1100 6550 2100
+	6550 1100 6550 1500
 Wire Wire Line
 	6550 1100 6750 1100
 Wire Wire Line
 	6750 1200 6600 1200
 Wire Wire Line
-	6600 1200 6600 2200
+	6600 1200 6600 1600
 Wire Wire Line
 	6750 1300 6650 1300
 Wire Wire Line
-	6650 1300 6650 2300
-Wire Wire Line
-	6650 2300 6700 2300
-Connection ~ 6700 2300
+	6650 1300 6650 1700
 Connection ~ 6600 2200
 Connection ~ 6550 2100
-Text Label 6450 2400 0    60   ~ 0
+Text Label 4650 3550 2    60   ~ 0
 EndstopDamper1
-Text Label 6450 2500 0    60   ~ 0
+Text Label 4650 3650 2    60   ~ 0
 EndstopDamper2
-Text Label 6450 2600 0    60   ~ 0
+Text Label 4650 3750 2    60   ~ 0
 EndstopDamper3
-Text Label 6450 4200 0    60   ~ 0
+Text Label 5050 4150 2    60   ~ 0
 FAN
-Text Label 6450 4800 0    60   ~ 0
+Text Label 5050 4050 2    60   ~ 0
 Damper3
-Text Label 6450 4700 0    60   ~ 0
+Text Label 5050 3950 2    60   ~ 0
 Damper2
-Text Label 6450 4600 0    60   ~ 0
+Text Label 5050 3850 2    60   ~ 0
 Damper1
 $Comp
-L GND #PWR017
+L power:GND #PWR017
 U 1 1 5741FD00
 P 4150 1200
 F 0 "#PWR017" H 4150 950 50  0001 C CNN
@@ -648,20 +603,20 @@ F 3 "" H 4150 1200 50  0000 C CNN
 $EndComp
 Text Label 4150 900  0    60   ~ 0
 PJON
-Text Label 6450 3900 0    60   ~ 0
+Text Label 3950 4350 2    60   ~ 0
 PJON
 Wire Wire Line
 	5850 6450 5850 6400
 Connection ~ 5850 6400
 Wire Wire Line
-	5200 7000 6200 7000
+	5200 7000 5450 7000
 Wire Wire Line
 	6200 7000 6200 6500
 Wire Wire Line
 	5850 6950 5850 7000
 Connection ~ 5850 7000
 $Comp
-L CONN_01X04 P101
+L lüfterklappenelektronik-rescue:CONN_01X04 P101
 U 1 1 574E47A5
 P 3950 950
 F 0 "P101" H 3869 575 50  0000 C CNN
@@ -672,18 +627,7 @@ F 3 "" H 3950 950 50  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +5V #PWR018
-U 1 1 574E4B60
-P 4500 1000
-F 0 "#PWR018" H 4500 850 50  0001 C CNN
-F 1 "+5V" H 4515 1173 50  0000 C CNN
-F 2 "" H 4500 1000 50  0000 C CNN
-F 3 "" H 4500 1000 50  0000 C CNN
-	1    4500 1000
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR019
+L power:+12V #PWR019
 U 1 1 574E4C3A
 P 4400 800
 F 0 "#PWR019" H 4400 650 50  0001 C CNN
@@ -695,95 +639,49 @@ F 3 "" H 4400 800 50  0000 C CNN
 $EndComp
 Wire Wire Line
 	4400 800  4150 800 
-Wire Wire Line
-	4150 1000 4500 1000
-NoConn ~ 4200 2000
-NoConn ~ 4200 2400
-NoConn ~ 4200 2600
-NoConn ~ 4200 3350
-NoConn ~ 4200 3450
-NoConn ~ 4200 3600
-NoConn ~ 4900 1750
-NoConn ~ 5500 1750
-NoConn ~ 5600 1750
-NoConn ~ 4200 4400
-NoConn ~ 4950 5150
 $Comp
-L GND #PWR020
+L power:GND #PWR020
 U 1 1 574E5B9A
-P 5200 5150
-F 0 "#PWR020" H 5200 4900 50  0001 C CNN
-F 1 "GND" H 5205 4977 50  0000 C CNN
-F 2 "" H 5200 5150 50  0000 C CNN
-F 3 "" H 5200 5150 50  0000 C CNN
-	1    5200 5150
+P 5550 4950
+F 0 "#PWR020" H 5550 4700 50  0001 C CNN
+F 1 "GND" H 5555 4777 50  0000 C CNN
+F 2 "" H 5550 4950 50  0000 C CNN
+F 3 "" H 5550 4950 50  0000 C CNN
+	1    5550 4950
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR021
+L power:GND #PWR021
 U 1 1 574E5C76
-P 5300 5150
-F 0 "#PWR021" H 5300 4900 50  0001 C CNN
-F 1 "GND" H 5305 4977 50  0000 C CNN
-F 2 "" H 5300 5150 50  0000 C CNN
-F 3 "" H 5300 5150 50  0000 C CNN
-	1    5300 5150
+P 5650 4950
+F 0 "#PWR021" H 5650 4700 50  0001 C CNN
+F 1 "GND" H 5655 4777 50  0000 C CNN
+F 2 "" H 5650 4950 50  0000 C CNN
+F 3 "" H 5650 4950 50  0000 C CNN
+	1    5650 4950
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR022
-U 1 1 574E5CE1
-P 5400 5150
-F 0 "#PWR022" H 5400 4900 50  0001 C CNN
-F 1 "GND" H 5405 4977 50  0000 C CNN
-F 2 "" H 5400 5150 50  0000 C CNN
-F 3 "" H 5400 5150 50  0000 C CNN
-	1    5400 5150
-	1    0    0    -1  
-$EndComp
-NoConn ~ 6450 4900
-NoConn ~ 6450 4500
-NoConn ~ 6450 4400
-NoConn ~ 6450 4100
-NoConn ~ 6450 3700
-NoConn ~ 6450 3000
-$Comp
-L +5V #PWR023
-U 1 1 574E66E4
-P 4950 1600
-F 0 "#PWR023" H 4950 1450 50  0001 C CNN
-F 1 "+5V" H 4965 1773 50  0000 C CNN
-F 2 "" H 4950 1600 50  0000 C CNN
-F 3 "" H 4950 1600 50  0000 C CNN
-	1    4950 1600
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4950 1600 4950 1750
-$Comp
-L +5V #PWR024
+L power:+5V #PWR024
 U 1 1 57537A4B
-P 4200 3200
-F 0 "#PWR024" H 4200 3050 50  0001 C CNN
-F 1 "+5V" H 4215 3373 50  0000 C CNN
-F 2 "" H 4200 3200 50  0000 C CNN
-F 3 "" H 4200 3200 50  0000 C CNN
-	1    4200 3200
+P 5750 2950
+F 0 "#PWR024" H 5750 2800 50  0001 C CNN
+F 1 "+5V" H 5765 3123 50  0000 C CNN
+F 2 "" H 5750 2950 50  0000 C CNN
+F 3 "" H 5750 2950 50  0000 C CNN
+	1    5750 2950
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6450 2000
-Text Label 6450 3300 0    60   ~ 0
+Text Label 6050 3950 0    60   ~ 0
 PS1SS
-Text Label 6450 3200 0    60   ~ 0
+Text Label 6050 4050 0    60   ~ 0
 PS2SS
-NoConn ~ 6450 2700
-NoConn ~ 6450 2900
-Text Label 6450 3400 0    60   ~ 0
+Text Label 5050 3350 2    60   ~ 0
 RX
-Text Label 6450 3500 0    60   ~ 0
+Text Label 5050 3450 2    60   ~ 0
 TX
 $Comp
-L CONN_01X03 P109
+L lüfterklappenelektronik-rescue:CONN_01X03 P109
 U 1 1 5753AEB1
 P 7600 3250
 F 0 "P109" H 7678 3291 50  0000 L CNN
@@ -794,7 +692,7 @@ F 3 "" H 7600 3250 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR025
+L power:GND #PWR025
 U 1 1 5753AF3D
 P 7400 3350
 F 0 "#PWR025" H 7400 3100 50  0001 C CNN
@@ -808,19 +706,14 @@ Text Label 7400 3150 2    60   ~ 0
 RX
 Text Label 7400 3250 2    60   ~ 0
 TX
-NoConn ~ 6450 3800
-NoConn ~ 5500 5150
-NoConn ~ 5250 1750
-Wire Wire Line
-	4950 1750 5150 1750
 Wire Wire Line
 	4150 1100 4150 1200
 Text Label 6750 1000 2    60   ~ 0
 PS3SS
-Text Label 6450 3600 0    60   ~ 0
+Text Label 6050 4150 0    60   ~ 0
 PS3SS
 $Comp
-L CONN_01X06 P103
+L lüfterklappenelektronik-rescue:CONN_01X06 P103
 U 1 1 575411B2
 P 6950 1050
 F 0 "P103" H 7027 1091 50  0000 L CNN
@@ -831,7 +724,7 @@ F 3 "" H 6950 1050 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR026
+L power:GND #PWR026
 U 1 1 575415B4
 P 6350 900
 F 0 "#PWR026" H 6350 650 50  0001 C CNN
@@ -842,7 +735,7 @@ F 3 "" H 6350 900 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR027
+L power:+5V #PWR027
 U 1 1 5754168E
 P 6650 800
 F 0 "#PWR027" H 6650 650 50  0001 C CNN
@@ -857,7 +750,7 @@ Wire Wire Line
 Wire Wire Line
 	6750 800  6650 800 
 $Comp
-L CONN_01X06 P105
+L lüfterklappenelektronik-rescue:CONN_01X06 P105
 U 1 1 57541E55
 P 7500 1450
 F 0 "P105" H 7577 1491 50  0000 L CNN
@@ -868,7 +761,7 @@ F 3 "" H 7500 1450 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X06 P104
+L lüfterklappenelektronik-rescue:CONN_01X06 P104
 U 1 1 57541EFB
 P 6950 2050
 F 0 "P104" H 7027 2091 50  0000 L CNN
@@ -879,7 +772,7 @@ F 3 "" H 6950 2050 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR028
+L power:+5V #PWR028
 U 1 1 57542451
 P 7300 1050
 F 0 "#PWR028" H 7300 900 50  0001 C CNN
@@ -892,7 +785,7 @@ $EndComp
 Wire Wire Line
 	7300 1050 7300 1200
 $Comp
-L GND #PWR029
+L power:GND #PWR029
 U 1 1 5754252B
 P 7100 1300
 F 0 "#PWR029" H 7100 1050 50  0001 C CNN
@@ -916,7 +809,7 @@ Wire Wire Line
 	7300 1500 6550 1500
 Connection ~ 6550 1500
 $Comp
-L +5V #PWR030
+L power:+5V #PWR030
 U 1 1 575429D1
 P 6750 1800
 F 0 "#PWR030" H 6750 1650 50  0001 C CNN
@@ -927,7 +820,7 @@ F 3 "" H 6750 1800 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR031
+L power:GND #PWR031
 U 1 1 57542A3F
 P 6700 1900
 F 0 "#PWR031" H 6700 1650 50  0001 C CNN
@@ -940,7 +833,7 @@ $EndComp
 Wire Wire Line
 	6700 1900 6750 1900
 $Comp
-L BUZ11 Q103
+L lüfterklappenelektronik-rescue:BUZ11 Q103
 U 1 1 57544167
 P 9050 5150
 F 0 "Q103" H 9285 5241 50  0000 L CNN
@@ -951,7 +844,7 @@ F 3 "" H 9050 5150 50  0000 L CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L BUZ11 Q102
+L lüfterklappenelektronik-rescue:BUZ11 Q102
 U 1 1 5754473E
 P 9050 3500
 F 0 "Q102" H 9285 3591 50  0000 L CNN
@@ -962,7 +855,7 @@ F 3 "" H 9050 3500 50  0000 L CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L BUZ11 Q101
+L lüfterklappenelektronik-rescue:BUZ11 Q101
 U 1 1 575449DD
 P 9050 1850
 F 0 "Q101" H 9285 1941 50  0000 L CNN
@@ -972,4 +865,265 @@ F 3 "" H 9050 1850 50  0000 L CNN
 	1    9050 1850
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	9150 1250 9150 1350
+Wire Wire Line
+	9150 1550 9150 1650
+Wire Wire Line
+	9150 2900 9150 3000
+Wire Wire Line
+	9150 3200 9150 3300
+Wire Wire Line
+	9150 4550 9150 4650
+Wire Wire Line
+	9150 4850 9150 4950
+Wire Wire Line
+	5450 6400 5850 6400
+Wire Wire Line
+	5450 7000 5850 7000
+Wire Wire Line
+	6600 2200 6750 2200
+Wire Wire Line
+	6550 2100 6750 2100
+Wire Wire Line
+	5850 6400 6200 6400
+Wire Wire Line
+	5850 7000 6200 7000
+Wire Wire Line
+	6650 1700 6650 2300
+Wire Wire Line
+	6600 1600 6600 2200
+Wire Wire Line
+	6550 1500 6550 2100
+Wire Wire Line
+	6450 2300 6750 2300
+$Comp
+L MCU_Module:Arduino_Nano_v3.x A?
+U 1 1 5BCE2E04
+P 5550 3950
+F 0 "A?" H 5550 2864 50  0000 C CNN
+F 1 "Arduino_Nano_v3.x" H 5550 2700 50  0000 C CNN
+F 2 "Module:Arduino_Nano" H 5700 3000 50  0001 L CNN
+F 3 "http://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf" H 5550 2950 50  0001 C CNN
+	1    5550 3950
+	1    0    0    -1  
+$EndComp
+Text Label 5050 4550 2    50   ~ 0
+MISO
+Text Label 5050 4450 2    50   ~ 0
+MOSI
+Text Label 5050 4650 2    50   ~ 0
+SCK
+NoConn ~ 6050 3750
+NoConn ~ 6050 3450
+NoConn ~ 6050 3350
+NoConn ~ 5450 2950
+NoConn ~ 5650 2950
+NoConn ~ 5050 4250
+NoConn ~ 6050 4250
+NoConn ~ 6050 4350
+NoConn ~ 6050 4450
+NoConn ~ 6050 4550
+NoConn ~ 6050 4650
+Text Label 6250 2100 2    50   ~ 0
+MOSI
+Text Label 6200 2250 2    50   ~ 0
+MISO
+Text Label 6300 2200 2    50   ~ 0
+SCK
+$Comp
+L Device:C C?
+U 1 1 5BD09D2B
+P 4500 2300
+F 0 "C?" H 4615 2346 50  0000 L CNN
+F 1 "1µF" H 4615 2255 50  0000 L CNN
+F 2 "" H 4538 2150 50  0001 C CNN
+F 3 "~" H 4500 2300 50  0001 C CNN
+	1    4500 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5BD09E6B
+P 4850 2300
+F 0 "C?" H 4965 2346 50  0000 L CNN
+F 1 "10µF" H 4965 2255 50  0000 L CNN
+F 2 "" H 4888 2150 50  0001 C CNN
+F 3 "~" H 4850 2300 50  0001 C CNN
+	1    4850 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5BD09ECB
+P 5200 2300
+F 0 "C?" H 5315 2346 50  0000 L CNN
+F 1 "100nF" H 5315 2255 50  0000 L CNN
+F 2 "" H 5238 2150 50  0001 C CNN
+F 3 "~" H 5200 2300 50  0001 C CNN
+	1    5200 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5BD0A025
+P 4850 2050
+F 0 "#PWR?" H 4850 1900 50  0001 C CNN
+F 1 "+5V" H 4865 2223 50  0000 C CNN
+F 2 "" H 4850 2050 50  0000 C CNN
+F 3 "" H 4850 2050 50  0000 C CNN
+	1    4850 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 2050 4850 2150
+Wire Wire Line
+	4850 2150 4500 2150
+Connection ~ 4850 2150
+Wire Wire Line
+	4850 2150 5200 2150
+$Comp
+L power:GND #PWR?
+U 1 1 5BD0FA59
+P 4850 2600
+F 0 "#PWR?" H 4850 2350 50  0001 C CNN
+F 1 "GND" H 4855 2427 50  0000 C CNN
+F 2 "" H 4850 2600 50  0000 C CNN
+F 3 "" H 4850 2600 50  0000 C CNN
+	1    4850 2600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 2600 4850 2450
+Wire Wire Line
+	4850 2450 4500 2450
+Connection ~ 4850 2450
+Wire Wire Line
+	4850 2450 5200 2450
+$Comp
+L Device:CP C?
+U 1 1 5BD16718
+P 3550 2300
+F 0 "C?" H 3668 2346 50  0000 L CNN
+F 1 "1000µF" H 3668 2255 50  0000 L CNN
+F 2 "" H 3588 2150 50  0001 C CNN
+F 3 "~" H 3550 2300 50  0001 C CNN
+	1    3550 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5BD16B1B
+P 4100 2300
+F 0 "C?" H 4215 2346 50  0000 L CNN
+F 1 "100nF" H 4215 2255 50  0000 L CNN
+F 2 "" H 4138 2150 50  0001 C CNN
+F 3 "~" H 4100 2300 50  0001 C CNN
+	1    4100 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4500 2150 4100 2150
+Connection ~ 4500 2150
+Wire Wire Line
+	4500 2450 4100 2450
+Connection ~ 4500 2450
+Wire Wire Line
+	3550 2150 4100 2150
+Connection ~ 4100 2150
+Wire Wire Line
+	4100 2450 3550 2450
+Connection ~ 4100 2450
+$Comp
+L Device:C C?
+U 1 1 5BD2283D
+P 4300 4500
+F 0 "C?" H 4415 4546 50  0000 L CNN
+F 1 "100nF" H 4415 4455 50  0000 L CNN
+F 2 "" H 4338 4350 50  0001 C CNN
+F 3 "~" H 4300 4500 50  0001 C CNN
+	1    4300 4500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4200 4350 4250 4350
+Wire Wire Line
+	4300 4350 5050 4350
+Connection ~ 4300 4350
+$Comp
+L power:GND #PWR?
+U 1 1 5BD29ED4
+P 4300 4650
+F 0 "#PWR?" H 4300 4400 50  0001 C CNN
+F 1 "GND" H 4305 4477 50  0000 C CNN
+F 2 "" H 4300 4650 50  0001 C CNN
+F 3 "" H 4300 4650 50  0001 C CNN
+	1    4300 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5BD2A2BA
+P 4100 4350
+F 0 "R?" V 4307 4350 50  0000 C CNN
+F 1 "0" V 4216 4350 50  0000 C CNN
+F 2 "" V 4030 4350 50  0001 C CNN
+F 3 "~" H 4100 4350 50  0001 C CNN
+	1    4100 4350
+	0    -1   -1   0   
+$EndComp
+Connection ~ 4250 4350
+Wire Wire Line
+	4250 4350 4300 4350
+$Comp
+L Device:D_Small D?
+U 1 1 5BD2D77A
+P 4750 3550
+F 0 "D?" H 4750 3755 50  0000 C CNN
+F 1 "D_Small" H 4750 3664 50  0000 C CNN
+F 2 "" V 4750 3550 50  0001 C CNN
+F 3 "~" V 4750 3550 50  0001 C CNN
+	1    4750 3550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 3550 5050 3550
+$Comp
+L Device:D_Small D?
+U 1 1 5BD33153
+P 4750 3650
+F 0 "D?" H 4750 3855 50  0000 C CNN
+F 1 "D_Small" H 4750 3764 50  0000 C CNN
+F 2 "" V 4750 3650 50  0001 C CNN
+F 3 "~" V 4750 3650 50  0001 C CNN
+	1    4750 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 3650 5050 3650
+$Comp
+L Device:D_Small D?
+U 1 1 5BD35D3D
+P 4750 3750
+F 0 "D?" H 4750 3955 50  0000 C CNN
+F 1 "D_Small" H 4750 3864 50  0000 C CNN
+F 2 "" V 4750 3750 50  0001 C CNN
+F 3 "~" V 4750 3750 50  0001 C CNN
+	1    4750 3750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 3750 5050 3750
+$Comp
+L ESP8266wemosD1:WeMos_mini U?
+U 1 1 5BD3E2DD
+P -1650 1850
+F 0 "U?" H -1650 2593 60  0000 C CNN
+F 1 "WeMos_mini" H -1650 2487 60  0000 C CNN
+F 2 "" H -1100 1150 60  0000 C CNN
+F 3 "http://www.wemos.cc/Products/d1_mini.html" H -1650 2381 60  0000 C CNN
+	1    -1650 1850
+	1    0    0    -1  
+$EndComp
+NoConn ~ 4150 1000
 $EndSCHEMATC

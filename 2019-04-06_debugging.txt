@@ -1,0 +1,7 @@
+1. sanchez noted, that the laminaflow damper would sometimes move when the light was turned on or off.
+2. Used this opportunity to disconnect the long 5V line between the µC and add a second 12V->5V DC/DC Buck Converter which supplys the Lamina/Laser µC and RaspberryPi from 12V
+3. had some problems with defective USB-cable contact
+4. problem remains
+5. further observation shows that µC does _not_ reboot, but ruther believes that the dumper is in the 0-position
+6. seems that the ceiling light, actually triggers the IR-forked light barrier endstop.
+
