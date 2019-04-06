@@ -37,7 +37,7 @@ Testing: Injecting Test PJON Packets
     echo -ne ">\x01\x06\x00\x00\x01\x01\x01\x01" >| /dev/ttyACM3
 
 #### Close all Dampers, Set Fan to ON
-(not: fan won't start if all dampers closed)
+(note: fan won't start if all dampers closed)
 
     echo -ne ">\x01\x06\x00\x00\x00\x00\x00\x01" >| /dev/ttyACM3
 
