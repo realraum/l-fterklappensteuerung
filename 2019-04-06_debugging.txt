@@ -5,4 +5,12 @@
 5. further observation shows that µC does _not_ reboot, but ruther believes that the dumper is in the 0-position
 6. seems that the ceiling light, actually triggers the IR-forked light barrier endstop.
 7. tried to naively shield endstop against external light, however no real improvement was achieved
-8. changing firmware to only accept endstop triggers when the motor is moving, but problems still can happen when someone turns on/off the light while the motor is moving
+8. changed firmware to only accept endstop triggers when the motor is moving, but problems still can happen when someone turns on/off the light while the motor is moving
+
+
+Status:
+- usb cable still has defective contact but no equally long cable is at hand. Currently works if not moved.
+- firmware change is effective, damper works well and does not move anymore when light is changed
+- stand-alone 5V generation seems to improve EMI suspectibility (no more long 5V/GND loop)
+- big C's are staying disconnected
+
