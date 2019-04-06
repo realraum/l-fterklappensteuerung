@@ -351,7 +351,8 @@ void task_check_endstops()
 {
   for (uint8_t d=0; d<NUM_DAMPER; d++)
   {
-    if (ENDSTOP_ISHIGH(d) == 0)
+    //trigger if endstop is pulled low, but ignore input if motor is not actually turning
+    if (ENDSTOP_ISHIGH(d) == 0 && DAMPER_ISRUNNING(d))
     {
       damper_endstop_reached_[d] = true;
     }
