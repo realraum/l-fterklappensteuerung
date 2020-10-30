@@ -303,9 +303,12 @@ U 1 1 5741C0A5
 P 1750 1700
 F 0 "U101" H 1750 2125 50  0000 C CNN
 F 1 "Gabellichtschranke" H 1750 2034 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 1700 50  0000 C CNN
-F 3 "" H 1750 1700 50  0000 C CNN
-F 4 "" H 1750 1700 50  0001 C CNN "DNF"
+F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 1700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 1700 50  0001 C CNN
+F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 1700 50  0001 C CNN "MF"
+F 5 "2510S-4P" H 1750 1700 50  0001 C CNN "MP"
+F 6 "LCSC" H 1750 1700 50  0001 C CNN "Distributor"
+F 7 "C140769" H 1750 1700 50  0001 C CNN "LCSCPartN"
 	1    1750 1700
 	1    0    0    -1  
 $EndComp
@@ -362,18 +365,6 @@ $EndComp
 Text Label 2650 1500 0    60   ~ 0
 EndstopDamper1
 $Comp
-L lüfterklappenelektronik-rescue:PHOTORESISTOR U102
-U 1 1 5741D5DE
-P 1750 3450
-F 0 "U102" H 1750 3875 50  0000 C CNN
-F 1 "Gabellichtschranke" H 1750 3784 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 3450 50  0000 C CNN
-F 3 "" H 1750 3450 50  0000 C CNN
-F 4 "DNF" H 1750 3450 50  0001 C CNN "DNF"
-	1    1750 3450
-	1    0    0    -1  
-$EndComp
-$Comp
 L lüfterklappenelektronik-rescue:R R102
 U 1 1 5741D5E4
 P 1150 2950
@@ -425,17 +416,6 @@ F 3 "" H 2350 3950 50  0000 C CNN
 $EndComp
 Text Label 2650 3250 0    60   ~ 0
 EndstopDamper2
-$Comp
-L lüfterklappenelektronik-rescue:PHOTORESISTOR U103
-U 1 1 5741D70C
-P 1750 5100
-F 0 "U103" H 1750 5525 50  0000 C CNN
-F 1 "Gabellichtschranke" H 1750 5434 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04" H 1750 5100 50  0000 C CNN
-F 3 "" H 1750 5100 50  0000 C CNN
-	1    1750 5100
-	1    0    0    -1  
-$EndComp
 $Comp
 L lüfterklappenelektronik-rescue:R R103
 U 1 1 5741D712
@@ -1691,33 +1671,21 @@ F 3 "" H 3850 6200 50  0001 C CNN
 	1    3850 6200
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3850 6200 3850 6550
 $Comp
 L Connector:Conn_01x02_Female J102
 U 1 1 5FB1F52D
 P 4050 6650
-F 0 "J102" H 4078 6626 50  0000 L CNN
+F 0 "J102" H 3950 6750 50  0000 L CNN
 F 1 "Conn_FAN" H 3700 6450 50  0000 L CNN
-F 2 "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical" H 4050 6650 50  0001 C CNN
+F 2 "Connect:PINHEAD1-2" H 4050 6650 50  0001 C CNN
 F 3 "~" H 4050 6650 50  0001 C CNN
+F 4 " BOOMELE(Boom Precision Elec) " H 4050 6650 50  0001 C CNN "MF"
+F 5 "C30436" H 4050 6650 50  0001 C CNN "MP"
+F 6 "LCSC" H 4050 6650 50  0001 C CNN "Distributor"
+F 7 "C30436" H 4050 6650 50  0001 C CNN "LCSCPartN"
 	1    4050 6650
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4400 6600 4400 6550
-Wire Wire Line
-	4400 6550 3850 6550
-Wire Wire Line
-	4400 6600 4650 6600
-Connection ~ 3850 6550
-Wire Wire Line
-	3850 6550 3850 6650
-Wire Wire Line
-	3850 6750 3850 6800
-Wire Wire Line
-	3850 6800 4650 6800
-Connection ~ 3850 6750
 $Comp
 L power:+3V3 #PWR0120
 U 1 1 5FBD2724
@@ -2668,6 +2636,68 @@ F 5 "BAT760-7" H 2500 4900 50  0001 C CNN "MP"
 F 6 "LCSC" H 2500 4900 50  0001 C CNN "Distributor"
 F 7 "C124187" H 2500 4900 50  0001 C CNN "LCSCPartN"
 	1    2500 4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J105
+U 1 1 60ECC0FE
+P 4250 6650
+F 0 "J105" H 4358 6831 50  0000 C CNN
+F 1 "#Stecker" H 4358 6740 50  0000 C CNN
+F 2 "" H 4250 6650 50  0001 C CNN
+F 3 "~" H 4250 6650 50  0001 C CNN
+F 4 "DNF" H 4250 6650 50  0001 C CNN "DNF"
+	1    4250 6650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3850 6200 3850 6650
+Wire Wire Line
+	4650 6600 4650 6650
+Wire Wire Line
+	4450 6650 4650 6650
+Wire Wire Line
+	4450 6750 4650 6750
+Wire Wire Line
+	4650 6750 4650 6800
+Wire Notes Line
+	4200 6250 6850 6250
+Wire Notes Line
+	6850 6250 6850 7350
+Wire Notes Line
+	6850 7350 4200 7350
+Wire Notes Line
+	4200 7350 4200 6250
+Text Notes 4250 7300 0    50   ~ 0
+Not part of PCB
+$Comp
+L lüfterklappenelektronik-rescue:PHOTORESISTOR U102
+U 1 1 60F4914E
+P 1750 3450
+F 0 "U102" H 1750 3875 50  0000 C CNN
+F 1 "Gabellichtschranke" H 1750 3784 50  0000 C CNN
+F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 3450 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 3450 50  0001 C CNN
+F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 3450 50  0001 C CNN "MF"
+F 5 "2510S-4P" H 1750 3450 50  0001 C CNN "MP"
+F 6 "LCSC" H 1750 3450 50  0001 C CNN "Distributor"
+F 7 "C140769" H 1750 3450 50  0001 C CNN "LCSCPartN"
+	1    1750 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L lüfterklappenelektronik-rescue:PHOTORESISTOR U103
+U 1 1 60F49E0C
+P 1750 5100
+F 0 "U103" H 1750 5525 50  0000 C CNN
+F 1 "Gabellichtschranke" H 1750 5434 50  0000 C CNN
+F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 5100 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 5100 50  0001 C CNN
+F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 5100 50  0001 C CNN "MF"
+F 5 "2510S-4P" H 1750 5100 50  0001 C CNN "MP"
+F 6 "LCSC" H 1750 5100 50  0001 C CNN "Distributor"
+F 7 "C140769" H 1750 5100 50  0001 C CNN "LCSCPartN"
+	1    1750 5100
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
