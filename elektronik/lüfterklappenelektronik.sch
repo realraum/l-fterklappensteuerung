@@ -466,7 +466,7 @@ U 1 1 574E47A5
 P 9450 3300
 F 0 "P101" H 9650 3250 50  0000 C CNN
 F 1 "PWR_BUS_CONN1" H 9800 3350 50  0000 C CNN
-F 2 "TerminalBlock_RND:TerminalBlock_RND_205-00289_1x04_P5.08mm_Horizontal" H 9450 3300 50  0001 C CNN
+F 2 "FootprintsTittelbach:WJ2EDGRC-5.08-4P" H 9450 3300 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/1912251635_Ningbo-Kangnex-Elec-WJ2EDGRC-5-08-4P_C8446.pdf" H 9450 3300 50  0001 C CNN
 F 4 "Ningbo Kangnex Elec" H 9450 3300 50  0001 C CNN "MF"
 F 5 "WJ2EDGRC-5.08-4P" H 9450 3300 50  0001 C CNN "MP"
@@ -2172,17 +2172,6 @@ F 3 "" H 1150 4350 50  0001 C CNN
 $EndComp
 Text Notes 12450 1150 0    50   ~ 0
 Power Use:\n0120mA ... Gabellichtschranken\n1000mA ... ESP32\n0010mA  ... Green LED\n0011mA  ... IR Led inside FAN SSR
-$Comp
-L Connector_Generic:Conn_02x05_Odd_Even J103
-U 1 1 60133D2E
-P 4750 10400
-F 0 "J103" H 4800 10817 50  0000 C CNN
-F 1 "Conn_LAN_ENC28J60" H 4800 10726 50  0000 C CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x05_P2.54mm_Vertical_SMD" H 4750 10400 50  0001 C CNN
-F 3 "~" H 4750 10400 50  0001 C CNN
-	1    4750 10400
-	-1   0    0    -1  
-$EndComp
 Text Label 4450 10200 2    50   ~ 0
 LAN_CLKOUT
 Text Label 4950 10200 0    50   ~ 0
@@ -2202,8 +2191,6 @@ F 3 "" H 5100 10850 50  0001 C CNN
 	1    5100 10850
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4950 10600 5100 10600
 Wire Wire Line
 	5100 10600 5100 10850
 $Comp
@@ -2230,13 +2217,9 @@ MISO
 Text Label 4100 10400 2    50   ~ 0
 MOSI
 Wire Wire Line
-	4950 10300 5450 10300
-Wire Wire Line
 	4100 10400 4450 10400
 Text Label 5450 10400 0    50   ~ 0
 SCK
-Wire Wire Line
-	5450 10400 4950 10400
 NoConn ~ 4450 10200
 NoConn ~ 4950 10200
 Text Label 8650 5550 0    50   ~ 0
@@ -2297,7 +2280,7 @@ U 1 1 60B3EA1F
 P 10650 3300
 F 0 "P109" H 10569 2925 50  0000 C CNN
 F 1 "PWR_BUS_CONN2" H 10569 3016 50  0000 C CNN
-F 2 "TerminalBlock_RND:TerminalBlock_RND_205-00289_1x04_P5.08mm_Horizontal" H 10650 3300 50  0001 C CNN
+F 2 "FootprintsTittelbach:WJ2EDGRC-5.08-4P" H 10650 3300 50  0001 C CNN
 F 3 "https://datasheet.lcsc.com/szlcsc/1912251635_Ningbo-Kangnex-Elec-WJ2EDGRC-5-08-4P_C8446.pdf" H 10650 3300 50  0001 C CNN
 F 4 "Ningbo Kangnex Elec" H 10650 3300 50  0001 C CNN "MF"
 F 5 "WJ2EDGRC-5.08-4P" H 10650 3300 50  0001 C CNN "MP"
@@ -2710,6 +2693,23 @@ F 5 "C30436" H 5150 4600 50  0001 C CNN "MP"
 F 6 "LCSC" H 5150 4600 50  0001 C CNN "Distributor"
 F 7 "C30436" H 5150 4600 50  0001 C CNN "LCSCPartN"
 	1    5150 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 10400 4950 10400
+Wire Wire Line
+	4950 10300 5450 10300
+Wire Wire Line
+	4950 10600 5100 10600
+$Comp
+L Connector_Generic:Conn_02x05_Odd_Even J103
+U 1 1 60133D2E
+P 4650 10400
+F 0 "J103" H 4700 10817 50  0000 C CNN
+F 1 "Conn_LAN_ENC28J60" H 4700 10726 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x05_P2.54mm_Vertical_SMD" H 4650 10400 50  0001 C CNN
+F 3 "~" H 4650 10400 50  0001 C CNN
+	1    4650 10400
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
