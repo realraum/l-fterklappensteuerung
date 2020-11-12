@@ -269,7 +269,7 @@ P 1750 1700
 F 0 "U101" H 1750 2125 50  0000 C CNN
 F 1 "Gabellichtschranke" H 1750 2034 50  0000 C CNN
 F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 1700 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 1700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1806151523_Ckmtw-Shenzhen-Cankemeng-2510S-4P_C140769.pdf" H 1750 1700 50  0001 C CNN
 F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 1700 50  0001 C CNN "MF"
 F 5 "2510S-4P" H 1750 1700 50  0001 C CNN "MP"
 F 6 "LCSC" H 1750 1700 50  0001 C CNN "Distributor"
@@ -2588,7 +2588,7 @@ P 1750 3450
 F 0 "U102" H 1750 3875 50  0000 C CNN
 F 1 "Gabellichtschranke" H 1750 3784 50  0000 C CNN
 F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 3450 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 3450 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1806151523_Ckmtw-Shenzhen-Cankemeng-2510S-4P_C140769.pdf" H 1750 3450 50  0001 C CNN
 F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 3450 50  0001 C CNN "MF"
 F 5 "2510S-4P" H 1750 3450 50  0001 C CNN "MP"
 F 6 "LCSC" H 1750 3450 50  0001 C CNN "Distributor"
@@ -2603,7 +2603,7 @@ P 1750 5100
 F 0 "U103" H 1750 5525 50  0000 C CNN
 F 1 "Gabellichtschranke" H 1750 5434 50  0000 C CNN
 F 2 "FootprintsTittelbach:Ckmtw_2510S-4P" H 1750 5100 50  0001 C CNN
-F 3 "https://datasheet.lcsc.com/szlcsc/1811061121_BOOMELE-Boom-Precision-Elec-C31753_C31753.pdf" H 1750 5100 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1806151523_Ckmtw-Shenzhen-Cankemeng-2510S-4P_C140769.pdf" H 1750 5100 50  0001 C CNN
 F 4 "Ckmtw(Shenzhen Cankemeng)" H 1750 5100 50  0001 C CNN "MF"
 F 5 "2510S-4P" H 1750 5100 50  0001 C CNN "MP"
 F 6 "LCSC" H 1750 5100 50  0001 C CNN "Distributor"
@@ -2616,44 +2616,14 @@ L Connector:Conn_01x02_Female J106
 U 1 1 60F95904
 P 5150 1300
 F 0 "J106" H 5050 1400 50  0000 L CNN
-F 1 "Ckmtw_2510S-2P" H 4800 1100 50  0000 L CNN
-F 2 "Connect:PINHEAD1-2" H 5150 1300 50  0001 C CNN
-F 3 "~" H 5150 1300 50  0001 C CNN
-F 4 " BOOMELE(Boom Precision Elec) " H 5150 1300 50  0001 C CNN "MF"
-F 5 "C30436" H 5150 1300 50  0001 C CNN "MP"
+F 1 "WJ2EDGRC-5.08-2P" H 4800 1100 50  0000 L CNN
+F 2 "FootprintsTittelbach:WJ2EDGRC-5.08-2P" H 5150 1300 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1912251631_Ningbo-Kangnex-Elec-WJ2EDGRC-5-08-2P_C3697.pdf" H 5150 1300 50  0001 C CNN
+F 4 "Ningbo Kangnex Elec" H 5150 1300 50  0001 C CNN "MF"
+F 5 "WJ2EDGRC-5.08-2P" H 5150 1300 50  0001 C CNN "MP"
 F 6 "LCSC" H 5150 1300 50  0001 C CNN "Distributor"
-F 7 "C30436" H 5150 1300 50  0001 C CNN "LCSCPartN"
+F 7 "C3697" H 5150 1300 50  0001 C CNN "LCSCPartN"
 	1    5150 1300
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_01x02_Female J107
-U 1 1 60FA2504
-P 5150 2950
-F 0 "J107" H 5050 3050 50  0000 L CNN
-F 1 "Ckmtw_2510S-2P" H 4800 2750 50  0000 L CNN
-F 2 "Connect:PINHEAD1-2" H 5150 2950 50  0001 C CNN
-F 3 "~" H 5150 2950 50  0001 C CNN
-F 4 " BOOMELE(Boom Precision Elec) " H 5150 2950 50  0001 C CNN "MF"
-F 5 "C30436" H 5150 2950 50  0001 C CNN "MP"
-F 6 "LCSC" H 5150 2950 50  0001 C CNN "Distributor"
-F 7 "C30436" H 5150 2950 50  0001 C CNN "LCSCPartN"
-	1    5150 2950
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_01x02_Female J108
-U 1 1 60FA3064
-P 5150 4600
-F 0 "J108" H 5050 4700 50  0000 L CNN
-F 1 "Ckmtw_2510S-2P" H 4800 4400 50  0000 L CNN
-F 2 "Connect:PINHEAD1-2" H 5150 4600 50  0001 C CNN
-F 3 "~" H 5150 4600 50  0001 C CNN
-F 4 " BOOMELE(Boom Precision Elec) " H 5150 4600 50  0001 C CNN "MF"
-F 5 "C30436" H 5150 4600 50  0001 C CNN "MP"
-F 6 "LCSC" H 5150 4600 50  0001 C CNN "Distributor"
-F 7 "C30436" H 5150 4600 50  0001 C CNN "LCSCPartN"
-	1    5150 4600
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -2721,6 +2691,36 @@ F 6 "LCSC" H 4850 5100 50  0001 C CNN "Distributor"
 F 7 "C51360" H 4850 5100 50  0001 C CNN "LCSCPartN"
 F 8 "SMT" H 4850 5100 50  0001 C CNN "Type"
 	1    4850 5100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Female J107
+U 1 1 5FB0C768
+P 5150 2950
+F 0 "J107" H 5050 3050 50  0000 L CNN
+F 1 "WJ2EDGRC-5.08-2P" H 4800 2750 50  0000 L CNN
+F 2 "FootprintsTittelbach:WJ2EDGRC-5.08-2P" H 5150 2950 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1912251631_Ningbo-Kangnex-Elec-WJ2EDGRC-5-08-2P_C3697.pdf" H 5150 2950 50  0001 C CNN
+F 4 "Ningbo Kangnex Elec" H 5150 2950 50  0001 C CNN "MF"
+F 5 "WJ2EDGRC-5.08-2P" H 5150 2950 50  0001 C CNN "MP"
+F 6 "LCSC" H 5150 2950 50  0001 C CNN "Distributor"
+F 7 "C3697" H 5150 2950 50  0001 C CNN "LCSCPartN"
+	1    5150 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Female J108
+U 1 1 5FB0D4B1
+P 5150 4600
+F 0 "J108" H 5050 4700 50  0000 L CNN
+F 1 "WJ2EDGRC-5.08-2P" H 4800 4400 50  0000 L CNN
+F 2 "FootprintsTittelbach:WJ2EDGRC-5.08-2P" H 5150 4600 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/1912251631_Ningbo-Kangnex-Elec-WJ2EDGRC-5-08-2P_C3697.pdf" H 5150 4600 50  0001 C CNN
+F 4 "Ningbo Kangnex Elec" H 5150 4600 50  0001 C CNN "MF"
+F 5 "WJ2EDGRC-5.08-2P" H 5150 4600 50  0001 C CNN "MP"
+F 6 "LCSC" H 5150 4600 50  0001 C CNN "Distributor"
+F 7 "C3697" H 5150 4600 50  0001 C CNN "LCSCPartN"
+	1    5150 4600
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
