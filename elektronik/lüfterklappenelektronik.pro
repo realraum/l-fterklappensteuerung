@@ -1,4 +1,4 @@
-update=Sa 31 Okt 2020 01:00:44
+update=Do 12 Nov 2020 20:16:16
 version=1
 last_client=kicad
 [cvpcb]
@@ -22,7 +22,7 @@ ERC_TestSimilarLabels=1
 [pcbnew]
 version=1
 PageLayoutDescrFile=
-LastNetListRead=
+LastNetListRead=lüfterklappenelektronik.net
 CopperLayerCount=4
 BoardThickness=1.6
 AllowMicroVias=0
@@ -64,7 +64,7 @@ OthersTextUpright=1
 SolderMaskClearance=0.2
 SolderMaskMinWidth=0
 SolderPasteClearance=0
-SolderPasteRatio=-0
+SolderPasteRatio=0
 [pcbnew/Layer.F.Cu]
 Name=F.Cu
 Type=0
