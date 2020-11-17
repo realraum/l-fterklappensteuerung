@@ -1,4 +1,4 @@
-update=Di 17 Nov 2020 18:14:14
+update=Di 17 Nov 2020 19:03:53
 version=1
 last_client=kicad
 [cvpcb]
@@ -234,7 +234,7 @@ Enabled=0
 [pcbnew/Netclasses]
 [pcbnew/Netclasses/Default]
 Name=Default
-Clearance=0.2
+Clearance=0.25
 TrackWidth=0.3
 ViaDiameter=0.6
 ViaDrill=0.4
@@ -245,7 +245,7 @@ dPairGap=0.25
 dPairViaGap=0.25
 [pcbnew/Netclasses/1]
 Name=12V
-Clearance=0.2
+Clearance=0.25
 TrackWidth=0.8
 ViaDiameter=0.6
 ViaDrill=0.4
@@ -256,7 +256,7 @@ dPairGap=0.25
 dPairViaGap=0.25
 [pcbnew/Netclasses/2]
 Name=3V3
-Clearance=0.2
+Clearance=0.25
 TrackWidth=0.4
 ViaDiameter=0.6
 ViaDrill=0.4
@@ -267,7 +267,7 @@ dPairGap=0.25
 dPairViaGap=0.25
 [pcbnew/Netclasses/3]
 Name=5V
-Clearance=0.2
+Clearance=0.25
 TrackWidth=0.5
 ViaDiameter=0.6
 ViaDrill=0.4
