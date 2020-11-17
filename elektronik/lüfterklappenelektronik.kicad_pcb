@@ -304,7 +304,7 @@
   )
 
   (module FootprintsTittelbach:WJ2EDGRC-5.08-2P (layer F.Cu) (tedit 5FAD6EC8) (tstamp 5F9CEA15)
-    (at 95.25 92.71)
+    (at 95.25 91.44)
     (descr "terminal block RND 205-00289, 4 pins, pitch 5.08mm, size 20.3x10.6mm^2, drill diamater 1.3mm, pad diameter 2.5mm, see http://cdn-reichelt.de/documents/datenblatt/C151/RND_205-00287_DB_EN.pdf, script-generated using https://github.com/pointhi/kicad-footprint-generator/scripts/TerminalBlock_RND")
     (tags "THT terminal block RND 205-00289 pitch 5.08mm size 20.3x10.6mm^2 drill 1.3mm pad 2.5mm")
     (path /5FB0C768)
@@ -596,7 +596,7 @@
   )
 
   (module Resistor_SMD:R_0603_1608Metric (layer F.Cu) (tedit 5B301BBD) (tstamp 5F9D37FA)
-    (at 87.63 105.41 270)
+    (at 87.63 104.14 270)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags resistor)
     (path /5741A896)
@@ -740,7 +740,7 @@
   )
 
   (module Resistor_SMD:R_0603_1608Metric (layer F.Cu) (tedit 5B301BBD) (tstamp 57538EC2)
-    (at 81.28 101.6 270)
+    (at 81.28 100.33 270)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags resistor)
     (path /5741D5F9)
@@ -848,7 +848,7 @@
   )
 
   (module Resistor_SMD:R_0603_1608Metric (layer F.Cu) (tedit 5B301BBD) (tstamp 57538EB3)
-    (at 90.17 101.6 90)
+    (at 90.17 100.33 90)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags resistor)
     (path /5741D5E4)
@@ -1006,7 +1006,7 @@
   )
 
   (module Diode_SMD:D_SOD-323 (layer F.Cu) (tedit 58641739) (tstamp 5F9CE84B)
-    (at 85.09 101.6 270)
+    (at 85.09 100.33 270)
     (descr SOD-323)
     (tags SOD-323)
     (path /60E69EAD)
@@ -1148,7 +1148,7 @@
   )
 
   (module Package_TO_SOT_SMD:TO-252-2 (layer F.Cu) (tedit 5A70A390) (tstamp 5F9D045D)
-    (at 96.52 107.95)
+    (at 96.52 106.68)
     (descr "TO-252 / DPAK SMD package, http://www.infineon.com/cms/en/product/packages/PG-TO252/PG-TO252-3-1/")
     (tags "DPAK TO-252 DPAK-3 TO-252-3 SOT-428")
     (path /6118E7D4)
@@ -1590,7 +1590,7 @@
   )
 
   (module FootprintsTittelbach:Ckmtw_2510S-4P (layer F.Cu) (tedit 5F9C621A) (tstamp 57538333)
-    (at 90.17 92.71 180)
+    (at 90.17 91.44 180)
     (path /60F4914E)
     (fp_text reference U102 (at 3.75 1.75) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
@@ -3406,7 +3406,7 @@
   )
 
   (module Diode_SMD:D_SMB (layer F.Cu) (tedit 58645DF3) (tstamp 5F9CE7CA)
-    (at 97.79 100.33)
+    (at 97.79 99.06)
     (descr "Diode SMB (DO-214AA)")
     (tags "Diode SMB (DO-214AA)")
     (path /60C1928D)
@@ -4155,7 +4155,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric (layer F.Cu) (tedit 5B301BBE) (tstamp 5FADFA17)
-    (at 87.63 97.79 90)
+    (at 87.63 96.52 90)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags capacitor)
     (path /5FDAE2A0)
@@ -4227,7 +4227,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric (layer F.Cu) (tedit 5B301BBE) (tstamp 5FADFA39)
-    (at 81.28 97.79 90)
+    (at 81.28 96.52 90)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags capacitor)
     (path /5FECD60D)
@@ -4407,7 +4407,7 @@
   )
 
   (module Inductor_SMD:L_0603_1608Metric_Pad1.05x0.95mm_HandSolder (layer F.Cu) (tedit 5B301BBE) (tstamp 5FADFAB0)
-    (at 90.17 97.79 270)
+    (at 90.17 96.52 270)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "inductor handsolder")
     (path /6041D11D)
@@ -4515,7 +4515,7 @@
   )
 
   (module Inductor_SMD:L_0603_1608Metric_Pad1.05x0.95mm_HandSolder (layer F.Cu) (tedit 5B301BBE) (tstamp 5FADFAE3)
-    (at 85.09 97.79 90)
+    (at 85.09 96.52 90)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "inductor handsolder")
     (path /5FEB3D8A)
@@ -4695,7 +4695,7 @@
   )
 
   (module Resistor_SMD:R_0603_1608Metric (layer F.Cu) (tedit 5B301BBD) (tstamp 5FADFB5A)
-    (at 82.55 105.41 180)
+    (at 82.55 104.14 180)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags resistor)
     (path /5FBFD21D)
@@ -4839,7 +4839,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric (layer F.Cu) (tedit 5B301BBE) (tstamp 5FB4388D)
-    (at 86.36 87.63)
+    (at 86.36 86.36)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags capacitor)
     (path /5FCDA679)
@@ -5107,7 +5107,7 @@
   (gr_text "Damper3\nMotor" (at 107.95 134.62) (layer F.SilkS) (tstamp 5FB49701)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
-  (gr_text "Damper2\nMotor" (at 97.79 86.36 180) (layer F.SilkS)
+  (gr_text "Damper2\nMotor" (at 97.79 85.09 180) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
   (gr_text "Damper1\nMotor" (at 83.82 134.62) (layer F.SilkS)
@@ -5116,7 +5116,7 @@
   (gr_text "D3\nEndstop" (at 124.46 134.62) (layer F.SilkS) (tstamp 5FB49704)
     (effects (font (size 1.5 1.5) (thickness 0.3)) (justify right))
   )
-  (gr_text "D2\nEndstop" (at 81.28 86.36 180) (layer F.SilkS)
+  (gr_text "D2\nEndstop" (at 81.28 85.09 180) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)) (justify right))
   )
   (gr_text "D1\nEndstop" (at 100.33 134.62) (layer F.SilkS)
