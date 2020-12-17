@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/bernhard/realraum/lüfterklappensteuerung/elektronik/lüfterklappenelektronik.sch)
-    (date "Mi 16 Dez 2020 15:25:08")
+    (date "Do 17 Dez 2020 14:31:51")
     (tool "Eeschema 5.1.5+dfsg1-2build2")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -465,13 +465,13 @@
       (tstamp 5FAD63E0))
     (comp (ref J102)
       (value Ckmtw_2510S-2P)
-      (footprint Connect:PINHEAD1-2)
+      (footprint FootprintsTittelbach:C30436_pinhead_1x2_vertical_P2.54)
       (datasheet https://datasheet.lcsc.com/szlcsc/2003201931_BOOMELE-Boom-Precision-Elec-C27543_C27543.pdf)
       (fields
         (field (name Distributor) LCSC)
-        (field (name LCSCPartN) C27543)
+        (field (name LCSCPartN) C30436)
         (field (name MF) "BOOMELE(Boom Precision Elec) ")
-        (field (name MP) C27543)
+        (field (name MP) C30436)
         (field (name Type) TH))
       (libsource (lib Connector) (part Conn_01x02_Female) (description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))
