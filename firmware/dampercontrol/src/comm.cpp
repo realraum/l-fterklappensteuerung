@@ -21,9 +21,6 @@
 */
 
 #include <stdio.h>
-#include <util/delay.h>
-#include <string.h>
-#include "usbio.h"
 #include "Arduino.h"
 #include "PJON.h"
 #include "dampercontrol.h"

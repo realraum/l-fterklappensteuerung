@@ -1,9 +1,8 @@
 Status
 =======
 
-It works very well.
+Migrating to platform.io and esp32
 
-Pressure Sensor code needs to be added. Work on adding bmp180 lib to avr-utils needs to be finished.
 
 Serial Msg Injection
 ====================

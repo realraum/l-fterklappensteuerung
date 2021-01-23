@@ -20,9 +20,9 @@
  *  along with these files. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef BMPE280_ENABLED
+
 #include <stdio.h>
-#include <avr/pgmspace.h>
-#include <LUFA/Drivers/Peripheral/SPI.h>
 #include "bmp280.h"
 #include "dampercontrol.h"
 
@@ -83,3 +83,5 @@ float get_latest_temperature(uint8_t sensorid)
 {
   return cur_temp_pressure[sensorid].temperature;
 }
+
+#endif

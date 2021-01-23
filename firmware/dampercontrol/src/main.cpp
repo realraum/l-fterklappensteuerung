@@ -2,9 +2,9 @@
  *  Damper Control Firmware
  *
  *
- *  Copyright (C) 2016 Bernhard Tittelbach <xro@realraum.at>
+ *  Copyright (C) 2016,2021 Bernhard Tittelbach <xro@realraum.at>
  *
- *  This software is made with love and spreadspace avr utils.
+ *  This software is made with love
  *
  *  Damper Control Firmware is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,19 +20,12 @@
  *  along with these files. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <avr/io.h>
-#include <avr/wdt.h>
-#include <avr/interrupt.h>
-#include <util/atomic.h>
-#include <util/delay.h>
-#include <avr/power.h>
-#include <stdio.h>
-
-#include "util.h"
-#include "led.h"
-#include "usbio.h"
-
+#include <stdint.h>
 #include "dampercontrol.h"
+#include <math.h>
+#include <EEPROM.h>
+#include <vector>
+
 
 
 //damper states: 0 means closed (means photoelectric fork sensor pulled LOW)

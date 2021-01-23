@@ -20,7 +20,6 @@
  *  along with these files. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <avr/eeprom.h>
 #include <stdio.h>
 #include "dampercontrol.h"
 

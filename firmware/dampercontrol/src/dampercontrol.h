@@ -23,6 +23,7 @@
 #ifndef DAMPER_CONTROL_H
 #define DAMPER_CONTROL_H
 
+#include <stdint.h>
 
 /* Hardware: AVR ATMEGA32U4 (Arduino Pro Micro)
  * PinOut: https://deskthority.net/wiki/Arduino_Pro_Micro
